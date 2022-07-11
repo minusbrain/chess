@@ -6,6 +6,11 @@
 
 #include "board.h"
 
+/**
+ * @brief Allows printing out chess-pieces with fmt
+ *
+ * @tparam ChessPiece
+ */
 template <>
 struct fmt::formatter<ChessPiece> {
     constexpr auto parse(format_parse_context &ctx) { return ctx.begin(); }
@@ -38,16 +43,31 @@ struct fmt::formatter<ChessPiece> {
     }
 };
 
+/**
+ * @brief Allows printing out chess-boards with fmt
+ *
+ * Supports formating option :b to print out a big board
+ * Example:
+ * @code {.cpp}
+ * fmt::print("Board: {}\n", standardBoard);
+ * fmt::print("Board: {:b}\n", standardBoard);
+ * @endcode
+ *
+ * @tparam ChessPiece
+ */
 template <>
 struct fmt::formatter<Board> {
     bool big = false;
 
     constexpr auto parse(format_parse_context &ctx) {
         auto it = ctx.begin(), end = ctx.end();
-        if (it != end && (*it == 'b')) {
-            big = true;
-            ++it;
+        while (it != end && *it != '}') {
+            if (*it == 'b') {
+                big = true;
+                ++it;
+            }
         }
+
         // Check if reached the end of the range:
         if (it != end && *it != '}') throw format_error("invalid format");
 
