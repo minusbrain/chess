@@ -9,6 +9,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -Werror")
 set(CMAKE_MODULE_PATH "${CMAKE_CXX_FLAGS}" "${CMAKE_CURRENT_SOURCE_DIR}")
 
 add_subdirectory(ext/fmt EXCLUDE_FROM_ALL)
+add_subdirectory(ext/aelib)
+find_package(OpenSSL REQUIRED)
 
 set (SOURCE_CPP
    src/main.cpp
@@ -19,6 +21,9 @@ set (SOURCE_CPP
 
 add_executable(chess ${SOURCE_CPP} ${SOURCE_H})
 target_include_directories(chess PRIVATE ext/fmt/include)
+target_include_directories(chess PRIVATE ext/aelib)
+target_include_directories(chess PRIVATE ${OPENSSL_INCLUDE_DIR})
 target_link_libraries(chess PRIVATE fmt::fmt-header-only)
+target_link_libraries(chess PRIVATE OpenSSL::Crypto)
 
 install(TARGETS chess DESTINATION bin)
