@@ -9,7 +9,7 @@
 enum class MoveModifier {
     CHECK,
     CHECK_MATE,
-    TAKE,
+    CAPTURE,
     EN_PASSANT,
     CASTLING_SHORT,
     CASTLING_LONG,
