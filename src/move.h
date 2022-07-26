@@ -12,7 +12,7 @@ class Move {
    public:
     Move(ChessPiece piece, ChessField start, ChessField end, std::set<MoveModifier> mods = {})
         : _piece(piece), _startField(start), _endField(end), _mods(mods) {}
-    Move(ChessPiece piece, ChessLine startLine, ChessRow startRow, ChessLine endLine, ChessRow endRow,
+    Move(ChessPiece piece, ChessFile startLine, ChessRank startRow, ChessFile endLine, ChessRank endRow,
          std::set<MoveModifier> mods = {})
         : _piece(piece), _startField{startLine, startRow}, _endField{endLine, endRow}, _mods(mods) {}
 

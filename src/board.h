@@ -18,22 +18,22 @@ enum class Piece { PAWN, ROOK, KNIGHT, BISHOP, QUEEN, KING };
  */
 using ChessPiece = std::tuple<Color, Piece>;
 
-using ChessLine = int;
-static const ChessLine A = 1;
-static const ChessLine B = 2;
-static const ChessLine C = 3;
-static const ChessLine D = 4;
-static const ChessLine E = 5;
-static const ChessLine F = 6;
-static const ChessLine G = 7;
-static const ChessLine H = 8;
+using ChessFile = int;
+static const ChessFile A = 1;
+static const ChessFile B = 2;
+static const ChessFile C = 3;
+static const ChessFile D = 4;
+static const ChessFile E = 5;
+static const ChessFile F = 6;
+static const ChessFile G = 7;
+static const ChessFile H = 8;
 
-using ChessRow = int;
+using ChessRank = int;
 
 /**
  * @brief The coordinates of a field on a chess-board
  */
-using ChessField = std::tuple<ChessLine, ChessRow>;
+using ChessField = std::tuple<ChessFile, ChessRank>;
 
 /**
  * @brief A chess-board with 8x8 fields
@@ -70,7 +70,7 @@ class Board {
      * @param row          Row to set the chess piece on (1-8)
      * @param chessPiece   The chess-piece to set on the field
      */
-    void setField(ChessLine line, ChessRow row, ChessPiece chessPiece);
+    void setField(ChessFile line, ChessRank row, ChessPiece chessPiece);
 
     /**
      * @brief Set a chess-piece on a field of the board
@@ -94,7 +94,7 @@ class Board {
      * @param line         Line of the field to clear (1-8)
      * @param row          Row of the field to clear (1-8)
      */
-    void clearField(ChessLine line, ChessRow row);
+    void clearField(ChessFile line, ChessRank row);
 
     /**
      * @brief Clear a field of the board
@@ -119,7 +119,7 @@ class Board {
      *
      * @returns Optional chess-piece that occupies the field
      */
-    std::optional<ChessPiece> getField(ChessLine line, ChessRow row) const;
+    std::optional<ChessPiece> getField(ChessFile line, ChessRank row) const;
 
     /**
      * @brief Return the chess-piece that is on a field of the board
@@ -142,7 +142,7 @@ class Board {
      * @param row   Row to translate
      * @returns     Array index to access for given line and row
      */
-    int lineRowToIndex(ChessLine line, ChessRow row) const;
+    int lineRowToIndex(ChessFile line, ChessRank row) const;
 
     std::array<std::optional<ChessPiece>, 64> _board;
 };
