@@ -2,9 +2,8 @@
 #include <fmt/core.h>
 #include <fmt/format.h>
 
-#include <cctype>
-
 #include "board.h"
+#include "common_debug.h"
 
 /**
  * @brief Allows printing out chess-pieces with fmt
@@ -17,29 +16,7 @@ struct fmt::formatter<ChessPiece> {
 
     template <typename FormatContext>
     auto format(const ChessPiece &p, FormatContext &ctx) {
-        char c = 'a';
-        switch (std::get<1>(p)) {
-            case Piece::PAWN:
-                c = 'p';
-                break;
-            case Piece::ROOK:
-                c = 'r';
-                break;
-            case Piece::KNIGHT:
-                c = 'n';
-                break;
-            case Piece::BISHOP:
-                c = 'b';
-                break;
-            case Piece::QUEEN:
-                c = 'q';
-                break;
-            case Piece::KING:
-                c = 'k';
-                break;
-        }
-        return (std::get<0>(p) == Color::BLACK ? format_to(ctx.out(), "{}", c)
-                                               : format_to(ctx.out(), "{}", (char)std::toupper(c)));
+        return format_to(ctx.out(), "{}", getDebugCharForPiece(p));
     }
 };
 
