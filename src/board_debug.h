@@ -26,7 +26,7 @@ struct fmt::formatter<ChessPiece> {
                 c = 'r';
                 break;
             case Piece::KNIGHT:
-                c = 'h';
+                c = 'n';
                 break;
             case Piece::BISHOP:
                 c = 'b';
@@ -38,7 +38,7 @@ struct fmt::formatter<ChessPiece> {
                 c = 'k';
                 break;
         }
-        return (std::get<0>(p) == Color::WHITE ? format_to(ctx.out(), "{}", c)
+        return (std::get<0>(p) == Color::BLACK ? format_to(ctx.out(), "{}", c)
                                                : format_to(ctx.out(), "{}", (char)std::toupper(c)));
     }
 };
