@@ -6,7 +6,18 @@
 
 #include "board.h"
 
-enum class MoveModifier { CHECK, CHECK_MATE, TAKE, EN_PASSANT, CASTLING_SHORT, CASTLING_LONG };
+enum class MoveModifier {
+    CHECK,
+    CHECK_MATE,
+    TAKE,
+    EN_PASSANT,
+    CASTLING_SHORT,
+    CASTLING_LONG,
+    PROMOTE_QUEEN,
+    PROMOTE_ROOK,
+    PROMOTE_BISHOP,
+    PROMOTE_KNIGHT
+};
 
 class Move {
    public:
