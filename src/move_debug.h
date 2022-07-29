@@ -96,8 +96,8 @@ struct fmt::formatter<Move> {
             return format_to(ctx.out(), "0-0-0");
         } else {
             auto cp = move.getChessPiece();
-            auto sf = move.getStartFiled();
-            auto ef = move.getEndFiled();
+            auto sf = move.getStartField();
+            auto ef = move.getEndField();
             return format_to(ctx.out(), "{}{}{}{}{}", chessPieceToLAN(cp), chessFieldToLAN(sf),
                              optionalCaptureIndicator(move), chessFieldToLAN(ef), optionalMoveSuffixes(move));
         }

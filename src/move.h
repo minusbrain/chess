@@ -2,7 +2,7 @@
 
 #include <set>
 
-#include "board.h"
+#include "types.h"
 
 enum class MoveModifier {
     CHECK,
@@ -28,8 +28,8 @@ class Move {
     bool hasModifier(MoveModifier mod) const;
 
     ChessPiece getChessPiece() const;
-    ChessField getStartFiled() const;
-    ChessField getEndFiled() const;
+    ChessField getStartField() const;
+    ChessField getEndField() const;
 
    private:
     ChessPiece _piece;

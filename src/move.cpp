@@ -13,5 +13,5 @@ std::set<MoveModifier> Move::getModifiers() const { return _mods; }
 bool Move::hasModifier(MoveModifier mod) const { return base::find(_mods, mod) != _mods.end(); }
 
 ChessPiece Move::getChessPiece() const { return _piece; }
-ChessField Move::getStartFiled() const { return _startField; }
-ChessField Move::getEndFiled() const { return _endField; }
+ChessField Move::getStartField() const { return _startField; }
+ChessField Move::getEndField() const { return _endField; }

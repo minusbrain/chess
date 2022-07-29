@@ -2,50 +2,9 @@
 #include <array>
 #include <optional>
 #include <set>
-#include <tuple>
 
-/**
- * @brief Color of a chess-piece
- */
-enum class Color { WHITE, BLACK };
-
-/**
- * @brief Type of a chess-piece
- */
-enum class Piece { PAWN, ROOK, KNIGHT, BISHOP, QUEEN, KING };
-
-/**
- * @brief A chess-piece with color and type
- */
-using ChessPiece = std::tuple<Color, Piece>;
-static const int ColorIdx = 0;
-static const int PieceIdx = 1;
-
-using ChessFile = int;
-static const ChessFile A = 1;
-static const ChessFile B = 2;
-static const ChessFile C = 3;
-static const ChessFile D = 4;
-static const ChessFile E = 5;
-static const ChessFile F = 6;
-static const ChessFile G = 7;
-static const ChessFile H = 8;
-
-using ChessRank = int;
-
-/**
- * @brief The coordinates of a field on a chess-board
- */
-using ChessField = std::tuple<ChessFile, ChessRank>;
-static const int ChessFileIdx = 0;
-static const int ChessRankIdx = 1;
-
-/**
- * @brief A chess-piece positioned on a field
- */
-using ChessPieceOnField = std::tuple<ChessPiece, ChessField>;
-static const int ChessPieceIdx = 0;
-static const int ChessFieldIdx = 1;
+#include "move.h"
+#include "types.h"
 
 class BoardHelper {
    public:
@@ -83,12 +42,14 @@ class Board {
     /**
      * @brief Construct a new chess-board object as a copy from an original
      */
-    Board(Board &orig);
+    Board(Board& orig);
 
     /**
      * @brief Destroy the chess-board object
      */
     ~Board();
+
+    bool operator==(const Board& other) const = default;
 
     /**
      * @brief Set a chess-piece on a field of the board
@@ -165,8 +126,31 @@ class Board {
      */
     std::optional<ChessPiece> getField(ChessField field) const;
 
+    /**
+     * @brief Get the All Pieces of one color currently on the board
+     *
+     * @param color
+     * @return Set of pieces currently on the board
+     */
     std::set<ChessPieceOnField> getAllPieces(Color color) const;
 
+    /**
+     * @brief Applies the requested move. Only very rudimentary checks are applied
+     *
+     * Applies the move. Removes the piece from the old field. Sets the piece to the new field
+     * Neither field must be out of bounds. startField must actually contain the piece. endField
+     * must either be empty or an enemy piece must be there. In case there is an enemy piece, the
+     * capture modifier must be set. There are no checks if the move is legal. En passant, castling
+     * and promotions are done properly but no rules are being checked if those are legal. Just that
+     * the pieces involved in the move are actually present and there end fields are free or an enemy
+     * to be captures is there.
+     *
+     * @param move  The move to execute
+     * @return bool - Was the move executed?
+     */
+    bool applyMove(Move move);
+
    private:
+    bool isInBounds(ChessField field);
     std::array<std::optional<ChessPiece>, 64> _board;
 };
