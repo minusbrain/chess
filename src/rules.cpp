@@ -62,6 +62,7 @@ std::vector<Move> ChessRules::getPotentialMoves(Board board, ChessPieceOnField p
 }
 
 std::vector<Move> ChessRules::getPotentialPawnMoves(Board board, ChessPieceOnField pieceOnField) {
+    // TODO: Implement
     std::vector<Move> potentialMoves;
     (void)board;
     (void)pieceOnField;
@@ -69,6 +70,7 @@ std::vector<Move> ChessRules::getPotentialPawnMoves(Board board, ChessPieceOnFie
 }
 
 std::vector<Move> ChessRules::getPotentialRookMoves(Board board, ChessPieceOnField pieceOnField) {
+    // TODO: Implement
     std::vector<Move> potentialMoves;
     (void)board;
     (void)pieceOnField;
@@ -76,6 +78,7 @@ std::vector<Move> ChessRules::getPotentialRookMoves(Board board, ChessPieceOnFie
 }
 
 std::vector<Move> ChessRules::getPotentialKnightMoves(Board board, ChessPieceOnField pieceOnField) {
+    // TODO: Implement
     std::vector<Move> potentialMoves;
     (void)board;
     (void)pieceOnField;
@@ -83,6 +86,7 @@ std::vector<Move> ChessRules::getPotentialKnightMoves(Board board, ChessPieceOnF
 }
 
 std::vector<Move> ChessRules::getPotentialBishopMoves(Board board, ChessPieceOnField pieceOnField) {
+    // TODO: Implement
     std::vector<Move> potentialMoves;
     (void)board;
     (void)pieceOnField;
@@ -90,6 +94,7 @@ std::vector<Move> ChessRules::getPotentialBishopMoves(Board board, ChessPieceOnF
 }
 
 std::vector<Move> ChessRules::getPotentialQueenMoves(Board board, ChessPieceOnField pieceOnField) {
+    // TODO: Implement
     std::vector<Move> potentialMoves;
     (void)board;
     (void)pieceOnField;
@@ -97,6 +102,7 @@ std::vector<Move> ChessRules::getPotentialQueenMoves(Board board, ChessPieceOnFi
 }
 
 std::vector<Move> ChessRules::getPotentialKingMoves(Board board, ChessPieceOnField pieceOnField) {
+    // TODO: Implement
     std::vector<Move> potentialMoves;
     (void)board;
     (void)pieceOnField;

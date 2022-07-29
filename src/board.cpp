@@ -73,7 +73,7 @@ std::optional<ChessField> determineEnPassantCaptureTarget(ChessField start, Ches
 
 bool Board::applyMove(Move move) {
     // TODO:
-    // En passant, castling
+    // castling
     //  * and promotions are done properly but no rules are being checked if those are legal. Just that
     //  * the pieces involved in the move are actually present and there end fields are free or an enemy
     //  * to be captures is there.
