@@ -1,6 +1,7 @@
 #pragma once
 #include <array>
 #include <optional>
+#include <set>
 #include <tuple>
 
 /**
@@ -34,6 +35,8 @@ using ChessRank = int;
  * @brief The coordinates of a field on a chess-board
  */
 using ChessField = std::tuple<ChessFile, ChessRank>;
+
+using ChessPieceOnField = std::tuple<ChessPiece, ChessField>;
 
 /**
  * @brief A chess-board with 8x8 fields
@@ -134,15 +137,21 @@ class Board {
      */
     std::optional<ChessPiece> getField(ChessField field) const;
 
+    std::set<ChessPieceOnField> getAllPieces(Color color) const;
+
    private:
     /**
-     * @brief Internal helper function that translates line and row into an index for the array
+     * @brief Internal helper function that translates a field (rank & file) into an index for the array
      *
-     * @param line  Line to translate
-     * @param row   Row to translate
+     * @todo Fix naming of file and rank. And change to fieldToIndex
+     *
+     * @param file  File to translate
+     * @param rank   Rank to translate
      * @returns     Array index to access for given line and row
      */
-    int lineRowToIndex(ChessFile line, ChessRank row) const;
+    int fieldToIndex(ChessFile file, ChessRank rank) const;
+
+    ChessField indexToField(int index) const;
 
     std::array<std::optional<ChessPiece>, 64> _board;
 };
