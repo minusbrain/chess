@@ -4,11 +4,12 @@
 
 #include <cctype>
 
+#include "board.h"
 #include "common_debug.h"
 #include "move.h"
 
 inline std::string chessPieceToLAN(ChessPiece cp) {
-    return std::get<1>(cp) == Piece::PAWN ? "" : std::string(1, getDebugCharForPiece(cp, false));
+    return std::get<ChessPieceIdx>(cp) == Piece::PAWN ? "" : std::string(1, getDebugCharForPiece(cp, false));
 }
 
 inline std::string chessFileToLAN(ChessFile file) {
@@ -45,8 +46,8 @@ inline std::string chessFileToLAN(ChessFile file) {
 inline std::string chessRankToLAN(ChessRank rank) { return std::string(1, 0x30 + rank); }
 
 inline std::string chessFieldToLAN(ChessField cf) {
-    std::string ret(chessFileToLAN(std::get<0>(cf)));
-    ret.append(chessRankToLAN(std::get<1>(cf)));
+    std::string ret(chessFileToLAN(std::get<ChessFileIdx>(cf)));
+    ret.append(chessRankToLAN(std::get<ChessRankIdx>(cf)));
 
     return ret;
 }

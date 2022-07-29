@@ -8,41 +8,44 @@ Board::Board() : _board() {}
 
 Board::~Board() {}
 
-void Board::setField(ChessFile line, ChessRank row, ChessPiece chessPiece) {
-    _board[fieldToIndex(line, row)] = chessPiece;
+void Board::setField(ChessFile file, ChessRank rank, ChessPiece chessPiece) {
+    _board[BoardHelper::fieldToIndex({file, rank})] = chessPiece;
 }
 
 void Board::setField(ChessField field, ChessPiece chessPiece) {
-    setField(std::get<0>(field), std::get<1>(field), chessPiece);
+    setField(std::get<ChessFileIdx>(field), std::get<ChessRankIdx>(field), chessPiece);
 }
 
-void Board::clearField(ChessFile line, ChessRank row) { _board[fieldToIndex(line, row)].reset(); }
+void Board::clearField(ChessFile file, ChessRank rank) { _board[BoardHelper::fieldToIndex({file, rank})].reset(); }
 
-void Board::clearField(ChessField field) { clearField(std::get<0>(field), std::get<1>(field)); }
+void Board::clearField(ChessField field) { clearField(std::get<ChessFileIdx>(field), std::get<ChessRankIdx>(field)); }
 
-std::optional<ChessPiece> Board::getField(ChessFile line, ChessRank row) const {
-    return _board[fieldToIndex(line, row)];
+std::optional<ChessPiece> Board::getField(ChessFile file, ChessRank rank) const {
+    return _board[BoardHelper::fieldToIndex({file, rank})];
 }
 
 std::optional<ChessPiece> Board::getField(ChessField field) const {
-    return getField(std::get<0>(field), std::get<1>(field));
+    return getField(std::get<ChessFileIdx>(field), std::get<ChessRankIdx>(field));
 }
 
-int Board::fieldToIndex(ChessFile file, ChessRank rank) const {
-    assert(rank > 0 && rank < 9 && file > 0 && file < 9);
-    return (rank - 1) * 8 + file - 1;
+int BoardHelper::fieldToIndex(ChessField field) {
+    assert(std::get<ChessRankIdx>(field) > 0 && std::get<ChessRankIdx>(field) < 9 &&
+           std::get<ChessFileIdx>(field) > 0 && std::get<ChessFileIdx>(field) < 9);
+    return (std::get<ChessRankIdx>(field) - 1) * 8 + std::get<ChessFileIdx>(field) - 1;
 }
 
-ChessField Board::indexToField(int index) const {
-    // TODO: Test und verify
-    ChessRank rank = index % 8;
-    ChessFile file = index - (rank * 8);
-    return {file, rank};
+ChessField BoardHelper::indexToField(int index) {
+    ChessFile file = (index % 8);
+    ChessRank rank = index / 8;
+    return {file + 1, rank + 1};
 }
 
 std::set<ChessPieceOnField> Board::getAllPieces(Color color) const {
-    // TODO: Implement
     std::set<ChessPieceOnField> pieces;
-    (void)color;
+    for (int i = 0; i < 64; ++i) {
+        if (_board[i].has_value() && std::get<ColorIdx>(_board[i].value()) == color) {
+            pieces.insert({_board[i].value(), BoardHelper::indexToField(i)});
+        }
+    }
     return pieces;
 }

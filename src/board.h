@@ -18,6 +18,8 @@ enum class Piece { PAWN, ROOK, KNIGHT, BISHOP, QUEEN, KING };
  * @brief A chess-piece with color and type
  */
 using ChessPiece = std::tuple<Color, Piece>;
+static const int ColorIdx = 0;
+static const int PieceIdx = 1;
 
 using ChessFile = int;
 static const ChessFile A = 1;
@@ -35,8 +37,34 @@ using ChessRank = int;
  * @brief The coordinates of a field on a chess-board
  */
 using ChessField = std::tuple<ChessFile, ChessRank>;
+static const int ChessFileIdx = 0;
+static const int ChessRankIdx = 1;
 
+/**
+ * @brief A chess-piece positioned on a field
+ */
 using ChessPieceOnField = std::tuple<ChessPiece, ChessField>;
+static const int ChessPieceIdx = 0;
+static const int ChessFieldIdx = 1;
+
+class BoardHelper {
+   public:
+    /**
+     * @brief Internal helper function that translates a field (rank & file) into an index for the array
+     *
+     * @param field  Field (File and Rank) to translate
+     * @returns     Array index to access for given line and row
+     */
+    static int fieldToIndex(ChessField field);
+
+    /**
+     * @brief Internal helper function that translates an array index to a chess-field (rank & file)
+     *
+     * @param index   Array index to translate
+     * @returns    Field (File and Rank) matching the index
+     */
+    static ChessField indexToField(int index);
+};
 
 /**
  * @brief A chess-board with 8x8 fields
@@ -140,18 +168,5 @@ class Board {
     std::set<ChessPieceOnField> getAllPieces(Color color) const;
 
    private:
-    /**
-     * @brief Internal helper function that translates a field (rank & file) into an index for the array
-     *
-     * @todo Fix naming of file and rank. And change to fieldToIndex
-     *
-     * @param file  File to translate
-     * @param rank   Rank to translate
-     * @returns     Array index to access for given line and row
-     */
-    int fieldToIndex(ChessFile file, ChessRank rank) const;
-
-    ChessField indexToField(int index) const;
-
     std::array<std::optional<ChessPiece>, 64> _board;
 };

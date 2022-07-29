@@ -5,7 +5,7 @@
 
 inline char getDebugCharForPiece(ChessPiece p, bool caseBasedOnColor = true) {
     char c;
-    switch (std::get<1>(p)) {
+    switch (std::get<ChessPieceIdx>(p)) {
         case Piece::PAWN:
             c = 'P';
             break;
@@ -25,7 +25,7 @@ inline char getDebugCharForPiece(ChessPiece p, bool caseBasedOnColor = true) {
             c = 'K';
             break;
     }
-    if (caseBasedOnColor && std::get<0>(p) == Color::BLACK)
+    if (caseBasedOnColor && std::get<ColorIdx>(p) == Color::BLACK)
         return (char)std::tolower(c);
     else
         return c;

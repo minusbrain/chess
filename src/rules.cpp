@@ -1,5 +1,7 @@
 #include "rules.h"
 
+#include "board.h"
+
 std::vector<Move> ChessRules::getAllValidMoves(Board board, Color color) {
     std::vector<Move> validMoves;
 
@@ -13,12 +15,34 @@ std::vector<Move> ChessRules::getAllValidMoves(Board board, Color color) {
     return validMoves;
 }
 
+// TODO: Refactor to use polymorphic approach to get movement options per piece
 std::vector<Move> ChessRules::getAllValidMoves(Board board, ChessPieceOnField pieceOnField) {
     std::vector<Move> validMoves;
 
-    // Todo Implement
-    (void)pieceOnField;
-    (void)board;
+    // ChessPiece cp = std::get<ChessPieceIdx>(pieceOnField);
+    // Color color = std::get<ColorIdx>(cp);
+    // Piece piece = std::get<PieceIdx>(cp);
+    // ChessField field = std::get<ChessFieldIdx>(pieceOnField);
+
+    std::vector<Move> potentialMoves = ChessRules::getPotentialMoves(board, pieceOnField);
+
+    for (auto potentialMove : potentialMoves) {
+        if (ChessRules::isMoveLegal(board, potentialMove)) validMoves.push_back(potentialMove);
+    }
 
     return validMoves;
+}
+
+std::vector<Move> ChessRules::getPotentialMoves(Board board, ChessPieceOnField pieceOnField) {
+    // TODO Implement
+    (void)board;
+    (void)pieceOnField;
+    return {};
+}
+
+bool ChessRules::isMoveLegal(Board board, Move potentialMove) {
+    // TODO Implement
+    (void)board;
+    (void)potentialMove;
+    return true;
 }
