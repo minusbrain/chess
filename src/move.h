@@ -1,7 +1,5 @@
 #pragma once
 
-#include <base/improve_containers.h>
-
 #include <set>
 
 #include "board.h"
@@ -21,19 +19,17 @@ enum class MoveModifier {
 
 class Move {
    public:
-    Move(ChessPiece piece, ChessField start, ChessField end, std::set<MoveModifier> mods = {})
-        : _piece(piece), _startField(start), _endField(end), _mods(mods) {}
+    Move(ChessPiece piece, ChessField start, ChessField end, std::set<MoveModifier> mods = {});
     Move(ChessPiece piece, ChessFile startLine, ChessRank startRow, ChessFile endLine, ChessRank endRow,
-         std::set<MoveModifier> mods = {})
-        : _piece(piece), _startField{startLine, startRow}, _endField{endLine, endRow}, _mods(mods) {}
+         std::set<MoveModifier> mods = {});
 
-    void addModifier(MoveModifier mod) { _mods.insert(mod); }
-    std::set<MoveModifier> getModifiers() const { return _mods; }
-    bool hasModifier(MoveModifier mod) const { return base::find(_mods, mod) != _mods.end(); }
+    void addModifier(MoveModifier mod);
+    std::set<MoveModifier> getModifiers() const;
+    bool hasModifier(MoveModifier mod) const;
 
-    ChessPiece getChessPiece() const { return _piece; }
-    ChessField getStartFiled() const { return _startField; }
-    ChessField getEndFiled() const { return _endField; }
+    ChessPiece getChessPiece() const;
+    ChessField getStartFiled() const;
+    ChessField getEndFiled() const;
 
    private:
     ChessPiece _piece;

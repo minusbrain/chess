@@ -15,6 +15,7 @@ set (SOURCE_CPP
    src/main.cpp
 
    src/board.cpp
+   src/move.cpp
    src/board_factory.cpp
 )
 
