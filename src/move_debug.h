@@ -9,7 +9,7 @@
 #include "move.h"
 
 inline std::string chessPieceToLAN(ChessPiece cp) {
-    return std::get<ChessPieceIdx>(cp) == Piece::PAWN ? "" : std::string(1, getDebugCharForPiece(cp, false));
+    return std::get<PieceIdx>(cp) == Piece::PAWN ? "" : std::string(1, getDebugCharForPiece(cp, false));
 }
 
 inline std::string chessFileToLAN(ChessFile file) {
