@@ -33,11 +33,74 @@ std::vector<Move> ChessRules::getAllValidMoves(Board board, ChessPieceOnField pi
     return validMoves;
 }
 
+// TODO: Refactor to use polymorphic approach to get movement options per piece
 std::vector<Move> ChessRules::getPotentialMoves(Board board, ChessPieceOnField pieceOnField) {
-    // TODO Implement
+    ChessPiece cp = std::get<ChessPieceIdx>(pieceOnField);
+    Piece piece = std::get<PieceIdx>(cp);
+
+    switch (piece) {
+        case Piece::PAWN:
+            return getPotentialPawnMoves(board, pieceOnField);
+            break;
+        case Piece::ROOK:
+            return getPotentialRookMoves(board, pieceOnField);
+            break;
+        case Piece::KNIGHT:
+            return getPotentialKnightMoves(board, pieceOnField);
+            break;
+        case Piece::BISHOP:
+            return getPotentialBishopMoves(board, pieceOnField);
+            break;
+        case Piece::QUEEN:
+            return getPotentialQueenMoves(board, pieceOnField);
+            break;
+        case Piece::KING:
+            return getPotentialKingMoves(board, pieceOnField);
+            break;
+    }
+    return {};
+}
+
+std::vector<Move> ChessRules::getPotentialPawnMoves(Board board, ChessPieceOnField pieceOnField) {
+    std::vector<Move> potentialMoves;
     (void)board;
     (void)pieceOnField;
-    return {};
+    return potentialMoves;
+}
+
+std::vector<Move> ChessRules::getPotentialRookMoves(Board board, ChessPieceOnField pieceOnField) {
+    std::vector<Move> potentialMoves;
+    (void)board;
+    (void)pieceOnField;
+    return potentialMoves;
+}
+
+std::vector<Move> ChessRules::getPotentialKnightMoves(Board board, ChessPieceOnField pieceOnField) {
+    std::vector<Move> potentialMoves;
+    (void)board;
+    (void)pieceOnField;
+    return potentialMoves;
+}
+
+std::vector<Move> ChessRules::getPotentialBishopMoves(Board board, ChessPieceOnField pieceOnField) {
+    std::vector<Move> potentialMoves;
+    (void)board;
+    (void)pieceOnField;
+    return potentialMoves;
+}
+
+std::vector<Move> ChessRules::getPotentialQueenMoves(Board board, ChessPieceOnField pieceOnField) {
+    std::vector<Move> potentialMoves;
+    (void)board;
+    (void)pieceOnField;
+    return potentialMoves;
+}
+
+std::vector<Move> ChessRules::getPotentialKingMoves(Board board, ChessPieceOnField pieceOnField) {
+    std::vector<Move> potentialMoves;
+    (void)board;
+    (void)pieceOnField;
+    return potentialMoves;
 }
 
 bool ChessRules::isMoveLegal(Board board, Move potentialMove) {
