@@ -32,6 +32,11 @@ target_include_directories(chess PRIVATE ext/fmt/include)
 target_include_directories(chess PRIVATE ext/aelib)
 target_link_libraries(chess PRIVATE fmt::fmt-header-only)
 
+add_executable(run_chess src/main.cpp)
+target_include_directories(run_chess PRIVATE ext/fmt/include)
+target_include_directories(run_chess PRIVATE ext/aelib)
+target_link_libraries(run_chess PRIVATE chess fmt::fmt-header-only)
+
 add_executable(test_chess ${TEST_SOURCE_CPP})
 target_link_libraries(test_chess PRIVATE chess GTest::gtest_main)
 
