@@ -1,4 +1,6 @@
 #pragma once
+#include <string>
+
 #include "board.h"
 
 /**
@@ -16,7 +18,6 @@ class BoardFactory {
      */
     static Board createEmptyBoard();
 
-   public:
     /**
      * @brief Creates a chess-board with standard chess-game setup
      *
@@ -26,4 +27,13 @@ class BoardFactory {
      * @return Created chess-board
      */
     static Board createStandardBoard();
+
+    /**
+     * @brief Creates a chess-board from FEN String
+     *
+     * Sets Chess Board from FEN String https://www.chess.com/terms/fen-chess
+     *
+     * @return Created chess-board
+     */
+    static Board creatBoardFromFEN(std::string fen);
 };

@@ -1,5 +1,13 @@
 #include "board_factory.h"
 
+#include <base/split.h>
+#include <fmt/core.h>
+#include <fmt/format.h>
+#include <fmt/ranges.h>
+
+#include "common_debug.h"
+#include "types.h"
+
 Board BoardFactory::createEmptyBoard() {
     Board board;
     return board;
@@ -40,6 +48,39 @@ Board BoardFactory::createStandardBoard() {
     board.setField(F, 8, ChessPiece{Color::BLACK, Piece::BISHOP});
     board.setField(G, 8, ChessPiece{Color::BLACK, Piece::KNIGHT});
     board.setField(H, 8, ChessPiece{Color::BLACK, Piece::ROOK});
+
+    board.setCastlingRaw(0xF);  // All four castling options still available
+
+    return board;
+}
+
+//           8/5k2/3p4/1p1Pp2p/pP2Pp1P/P4P1K/8/8 b - - 99 50
+
+// currently this assumes a valid FEN string and will fail in case of an invalid one
+Board BoardFactory::creatBoardFromFEN(std::string fen) {
+    Board board;
+
+    std::vector<std::string> fields = base::split(fen, ' ');
+    std::vector<std::string> ranks = base::split(fields[0], '/');
+    // fmt::print("\nFields: {}", fields);
+    // fmt::print("\nRanks: {}", ranks);
+
+    int rank = 8;
+    for (auto rankStr : ranks) {
+        int file = A;
+
+        for (char c : rankStr) {
+            if (c >= 0x31 && c <= 0x38) {
+                int skip = (c - 0x30);
+                file += skip;
+                continue;
+            }
+            ChessPiece cp = getChessPieceFromDebugChar(c);
+            board.setField({file, rank}, cp);
+            ++file;
+        }
+        --rank;
+    }
 
     return board;
 }
