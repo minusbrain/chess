@@ -57,6 +57,7 @@ Board BoardFactory::createStandardBoard() {
 //           8/5k2/3p4/1p1Pp2p/pP2Pp1P/P4P1K/8/8 b - - 99 50
 
 // currently this assumes a valid FEN string and will fail in case of an invalid one
+// Todo: Sanity checks and implementation for EnPassant Target
 Board BoardFactory::creatBoardFromFEN(std::string fen) {
     Board board;
 
@@ -80,6 +81,16 @@ Board BoardFactory::creatBoardFromFEN(std::string fen) {
             ++file;
         }
         --rank;
+    }
+
+    if (fields.size() > 1) {
+        Color turn = (fields[1] == "w" ? Color::WHITE : Color::BLACK);
+        board.setTurn(turn);
+
+        if (fields[2].find('Q') != std::string::npos) board.setCastling(Board::Castling::WHITE_LONG);
+        if (fields[2].find('K') != std::string::npos) board.setCastling(Board::Castling::WHITE_SHORT);
+        if (fields[2].find('q') != std::string::npos) board.setCastling(Board::Castling::BLACK_LONG);
+        if (fields[2].find('k') != std::string::npos) board.setCastling(Board::Castling::BLACK_SHORT);
     }
 
     return board;
