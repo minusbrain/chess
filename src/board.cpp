@@ -7,9 +7,10 @@
 #include "move.h"
 #include "types.h"
 
-Board::Board(Board &orig) : _board(orig._board) {}
+Board::Board(Board &orig)
+    : _board(orig._board), _canCastle(orig._canCastle), _enpassantTarget(orig._enpassantTarget), _turn(orig._turn) {}
 
-Board::Board() : _board() {}
+Board::Board() : _board(), _canCastle(0x00), _enpassantTarget(), _turn(Color::WHITE) {}
 
 Board::~Board() {}
 
@@ -45,11 +46,11 @@ ChessField BoardHelper::indexToField(int index) {
     return {file + 1, rank + 1};
 }
 
-std::set<ChessPieceOnField> Board::getAllPieces(Color color) const {
-    std::set<ChessPieceOnField> pieces;
+std::vector<ChessPieceOnField> Board::getAllPieces(Color color) const {
+    std::vector<ChessPieceOnField> pieces;
     for (int i = 0; i < 64; ++i) {
         if (_board[i].has_value() && std::get<ColorIdx>(_board[i].value()) == color) {
-            pieces.insert({_board[i].value(), BoardHelper::indexToField(i)});
+            pieces.push_back({_board[i].value(), BoardHelper::indexToField(i)});
         }
     }
     return pieces;
@@ -118,3 +119,16 @@ bool Board::applyMove(Move move) {
     setField(ef, cp);
     return true;
 }
+
+bool Board::canCastle(Castling castling) const { return _canCastle.check(castling); }
+void Board::setCastlingRaw(uint8_t value) { _canCastle.raw_set(value); }
+void Board::setCastling(Castling castling) { _canCastle.set(castling); }
+void Board::unsetCastling(Castling castling) { _canCastle.unset(castling); }
+
+std::optional<ChessField> Board::getEnPassantTarget() const { return _enpassantTarget.value(); }
+bool Board::hasEnPassantTarget() const { return _enpassantTarget.has_value(); };
+void Board::removeEnPassantTarget() { _enpassantTarget.reset(); }
+void Board::setEnPassantTarget(ChessField field) { _enpassantTarget = field; }
+
+Color Board::whosTurnIsIt() const { return _turn; }
+void Board::setTurn(Color color) { _turn = color; }

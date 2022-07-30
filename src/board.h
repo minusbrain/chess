@@ -1,7 +1,10 @@
 #pragma once
+#include <base/flag_mask.h>
+
 #include <array>
+#include <cstdint>
 #include <optional>
-#include <set>
+#include <vector>
 
 #include "move.h"
 #include "types.h"
@@ -132,7 +135,7 @@ class Board {
      * @param color
      * @return Set of pieces currently on the board
      */
-    std::set<ChessPieceOnField> getAllPieces(Color color) const;
+    std::vector<ChessPieceOnField> getAllPieces(Color color) const;
 
     /**
      * @brief Applies the requested move. Only very rudimentary checks are applied
@@ -150,7 +153,24 @@ class Board {
      */
     bool applyMove(Move move);
 
+    enum class Castling : char { WHITE_SHORT = 0x01, WHITE_LONG = 0x02, BLACK_SHORT = 0x04, BLACK_LONG = 0x08 };
+    bool canCastle(Castling castling) const;
+    void setCastlingRaw(uint8_t);
+    void setCastling(Castling castling);
+    void unsetCastling(Castling castling);
+
+    std::optional<ChessField> getEnPassantTarget() const;
+    bool hasEnPassantTarget() const;
+    void removeEnPassantTarget();
+    void setEnPassantTarget(ChessField);
+
+    Color whosTurnIsIt() const;
+    void setTurn(Color);
+
    private:
     bool isInBounds(ChessField field);
     std::array<std::optional<ChessPiece>, 64> _board;
+    base::flag_mask<Castling> _canCastle;
+    std::optional<ChessField> _enpassantTarget;
+    Color _turn;
 };
