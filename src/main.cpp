@@ -6,12 +6,18 @@
 #include "move_debug.h"
 #include "rules.h"
 
-int main(int, char**) {
-    Board stdBoard = BoardFactory::createStandardBoard();
+int main(int argc, char** argv) {
+    std::string fen;
+    if (argc > 1) {
+        fen.assign(argv[1]);
+    }
 
-    fmt::print("Board:\n{:b}\n", stdBoard);
+    Board fenBoard = BoardFactory::creatBoardFromFEN(fen);
 
-    auto validMovesWhite = ChessRules::getAllValidMoves(stdBoard, Color::WHITE);
+    fmt::print("\nFEN String {}", fen);
+    fmt::print("FEN Board:\n{:b}\n", fenBoard);
+
+    auto validMovesWhite = ChessRules::getAllValidMoves(fenBoard, Color::WHITE);
 
     fmt::print("Valid moves for White:\n");
     for (auto validMoveWhite : validMovesWhite) {
