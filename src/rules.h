@@ -9,6 +9,8 @@ class ChessRules {
     static std::vector<Move> getAllValidMoves(Board board, Color color);
     static std::vector<Move> getAllValidMoves(Board board, ChessPieceOnField pieceOnField);
 
+    static bool isCheck(Board board, Color color);
+
     static std::vector<Move> getPotentialMoves(Board board, ChessPieceOnField pieceOnField);
     static std::vector<Move> getPotentialPawnMoves(Board board, ChessPieceOnField pieceOnField);
     static std::vector<Move> getPotentialRookMoves(Board board, ChessPieceOnField pieceOnField);
