@@ -45,7 +45,7 @@ class Board {
     /**
      * @brief Construct a new chess-board object as a copy from an original
      */
-    Board(Board& orig);
+    Board(const Board& orig);
 
     /**
      * @brief Destroy the chess-board object
@@ -166,6 +166,8 @@ class Board {
 
     Color whosTurnIsIt() const;
     void setTurn(Color);
+
+    std::optional<ChessField> findFirstPiece(ChessPiece cp) const;
 
    private:
     bool isInBounds(ChessField field);

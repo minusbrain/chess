@@ -1,37 +1,76 @@
 #include "rules.h"
 
+#include <base/improve_containers.h>
+
 #include <cassert>
 
 #include "board.h"
 #include "move.h"
+#include "move_debug.h"
 #include "types.h"
 
-bool ChessRules::isCheck(const Board&, Color) {
-    // Todo: Implement
-    return true;
+bool ChessRules::isCheck(const Board& board) {
+    std::vector<Move> validMovesOtherColor;
+    std::optional<ChessField> kingFieldOpt = board.findFirstPiece({board.whosTurnIsIt(), Piece::KING});
+    assert(kingFieldOpt.has_value());
+    ChessField kingField = kingFieldOpt.value();
+
+    Board otherPlayerBoard(board);
+    otherPlayerBoard.setTurn(board.whosTurnIsIt() == Color::WHITE ? Color::BLACK : Color::WHITE);
+
+    validMovesOtherColor = ChessRules::getAllValidMoves(otherPlayerBoard);
+    int numOfKingCaptureMoves = base::count_if(validMovesOtherColor, [&kingField](const Move& move) {
+        return (move.getEndField() == kingField && move.hasModifier(MoveModifier::CAPTURE));
+    });
+
+    if (numOfKingCaptureMoves > 0)
+        return true;
+    else
+        return false;
 };
 
-std::vector<Move> ChessRules::getAllValidMoves(const Board& board) {
+bool ChessRules::wouldBeCheck(const Board& board, const Move& move) {
+    std::vector<Move> validMoves;
+    Color color = board.whosTurnIsIt();
+
+    Board otherPlayerBoard(board);
+    assert(otherPlayerBoard.applyMove(move) == true);
+    std::optional<ChessField> kingFieldOpt = otherPlayerBoard.findFirstPiece({color, Piece::KING});
+    assert(kingFieldOpt.has_value());
+    ChessField kingField = kingFieldOpt.value();
+
+    validMoves = ChessRules::getAllValidMoves(otherPlayerBoard, true);
+    int numOfKingCaptureMoves = base::count_if(validMoves, [&kingField](const Move& move) {
+        return (move.getEndField() == kingField && move.hasModifier(MoveModifier::CAPTURE));
+    });
+
+    if (numOfKingCaptureMoves > 0)
+        return true;
+    else
+        return false;
+};
+
+std::vector<Move> ChessRules::getAllValidMoves(const Board& board, bool ignoreCheck) {
     std::vector<Move> validMoves;
 
     auto allPiecesOfRequestedColor = board.getAllPieces(board.whosTurnIsIt());
 
     for (auto pieceOnField : allPiecesOfRequestedColor) {
-        auto validMovesOfSinglePiece = ChessRules::getAllValidMoves(board, pieceOnField);
-        validMoves.insert(validMoves.end(), validMovesOfSinglePiece.begin(), validMovesOfSinglePiece.end());
+        auto validMovesOfSinglePiece = ChessRules::getAllValidMoves(board, pieceOnField, ignoreCheck);
+        base::push_back(validMoves, validMovesOfSinglePiece);
     };
 
     return validMoves;
 }
 
 // TODO: Refactor to use polymorphic approach to get movement options per piece
-std::vector<Move> ChessRules::getAllValidMoves(const Board& board, ChessPieceOnField pieceOnField) {
+std::vector<Move> ChessRules::getAllValidMoves(const Board& board, ChessPieceOnField pieceOnField, bool ignoreCheck) {
     std::vector<Move> validMoves;
 
     std::vector<Move> potentialMoves = ChessRules::getPotentialMoves(board, pieceOnField);
 
     for (auto potentialMove : potentialMoves) {
-        if (ChessRules::isMoveLegal(board, potentialMove)) validMoves.push_back(potentialMove);
+        if (ChessRules::isMoveLegal(board, potentialMove, ignoreCheck)) validMoves.push_back(potentialMove);
     }
 
     return validMoves;
@@ -178,6 +217,11 @@ bool addMoveOrIsBlocked(const Board& board, ChessField potentialMoveField, std::
     ChessPiece cp = std::get<ChessPieceIdx>(pieceOnField);
     Color color = std::get<ColorIdx>(cp);
     ChessField currentField = std::get<ChessFieldIdx>(pieceOnField);
+
+    if (std::get<ChessFileIdx>(potentialMoveField) < A || std::get<ChessFileIdx>(potentialMoveField) > H ||
+        std::get<ChessRankIdx>(potentialMoveField) < 1 || std::get<ChessRankIdx>(potentialMoveField) > 8)
+        return true;
+
     if (!board.getField(potentialMoveField).has_value()) {
         potentialMoves.push_back(Move{cp, currentField, potentialMoveField});
     } else if (std::get<ColorIdx>(board.getField(potentialMoveField).value()) == color) {
@@ -219,10 +263,20 @@ std::vector<Move> ChessRules::getPotentialRookMoves(const Board& board, ChessPie
 }
 
 std::vector<Move> ChessRules::getPotentialKnightMoves(const Board& board, ChessPieceOnField pieceOnField) {
-    // TODO: Implement
     std::vector<Move> potentialMoves;
-    (void)board;
-    (void)pieceOnField;
+    ChessField currentField = std::get<ChessFieldIdx>(pieceOnField);
+    ChessFile currentFile = std::get<ChessFileIdx>(currentField);
+    ChessFile currentRank = std::get<ChessRankIdx>(currentField);
+
+    addMoveOrIsBlocked(board, {currentFile - 2, currentRank - 1}, potentialMoves, pieceOnField);
+    addMoveOrIsBlocked(board, {currentFile - 2, currentRank + 1}, potentialMoves, pieceOnField);
+    addMoveOrIsBlocked(board, {currentFile + 2, currentRank - 1}, potentialMoves, pieceOnField);
+    addMoveOrIsBlocked(board, {currentFile + 2, currentRank + 1}, potentialMoves, pieceOnField);
+    addMoveOrIsBlocked(board, {currentFile - 1, currentRank - 2}, potentialMoves, pieceOnField);
+    addMoveOrIsBlocked(board, {currentFile - 1, currentRank + 2}, potentialMoves, pieceOnField);
+    addMoveOrIsBlocked(board, {currentFile + 1, currentRank - 2}, potentialMoves, pieceOnField);
+    addMoveOrIsBlocked(board, {currentFile + 1, currentRank + 2}, potentialMoves, pieceOnField);
+
     return potentialMoves;
 }
 
@@ -256,25 +310,56 @@ std::vector<Move> ChessRules::getPotentialBishopMoves(const Board& board, ChessP
 }
 
 std::vector<Move> ChessRules::getPotentialQueenMoves(const Board& board, ChessPieceOnField pieceOnField) {
-    std::vector<Move> potentialMovesLikeRook = getPotentialRookMoves(board, pieceOnField);
-    std::vector<Move> potentialMovesLikeBishop = getPotentialBishopMoves(board, pieceOnField);
-
-    potentialMovesLikeRook.insert(potentialMovesLikeRook.end(), potentialMovesLikeBishop.begin(), potentialMovesLikeBishop.end());
-
-    return potentialMovesLikeRook;
-}
-
-std::vector<Move> ChessRules::getPotentialKingMoves(const Board& board, ChessPieceOnField pieceOnField) {
-    // TODO: Implement
     std::vector<Move> potentialMoves;
-    (void)board;
-    (void)pieceOnField;
+    base::push_back(potentialMoves, getPotentialRookMoves(board, pieceOnField));
+    base::push_back(potentialMoves, getPotentialBishopMoves(board, pieceOnField));
+
     return potentialMoves;
 }
 
-bool ChessRules::isMoveLegal(const Board& board, Move potentialMove) {
-    // TODO Implement
-    (void)board;
-    (void)potentialMove;
-    return true;
+std::vector<Move> ChessRules::getPotentialKingMoves(const Board& board, ChessPieceOnField pieceOnField) {
+    std::vector<Move> potentialMoves;
+    ChessPiece cp = std::get<ChessPieceIdx>(pieceOnField);
+    ChessField currentField = std::get<ChessFieldIdx>(pieceOnField);
+    ChessFile currentFile = std::get<ChessFileIdx>(currentField);
+    ChessFile currentRank = std::get<ChessRankIdx>(currentField);
+
+    addMoveOrIsBlocked(board, {currentFile + 1, currentRank + 1}, potentialMoves, pieceOnField);
+    addMoveOrIsBlocked(board, {currentFile + 1, currentRank - 1}, potentialMoves, pieceOnField);
+    addMoveOrIsBlocked(board, {currentFile + 1, currentRank}, potentialMoves, pieceOnField);
+    addMoveOrIsBlocked(board, {currentFile, currentRank + 1}, potentialMoves, pieceOnField);
+    addMoveOrIsBlocked(board, {currentFile, currentRank - 1}, potentialMoves, pieceOnField);
+    addMoveOrIsBlocked(board, {currentFile - 1, currentRank + 1}, potentialMoves, pieceOnField);
+    addMoveOrIsBlocked(board, {currentFile - 1, currentRank - 1}, potentialMoves, pieceOnField);
+    addMoveOrIsBlocked(board, {currentFile - 1, currentRank}, potentialMoves, pieceOnField);
+
+    if (board.whosTurnIsIt() == Color::WHITE) {
+        if (board.canCastle(Board::Castling::WHITE_LONG)) {
+            if (!board.getField({B, 1}).has_value() && !board.getField({C, 1}).has_value() && !board.getField({D, 1}).has_value()) {
+                potentialMoves.push_back(Move{cp, currentField, {C, 1}, {MoveModifier::CASTLING_LONG}});
+            }
+        }
+        if (board.canCastle(Board::Castling::WHITE_SHORT)) {
+            if (!board.getField({F, 1}).has_value() && !board.getField({G, 1}).has_value()) {
+                potentialMoves.push_back(Move{cp, currentField, {G, 1}, {MoveModifier::CASTLING_SHORT}});
+            }
+        }
+    } else {
+        if (board.canCastle(Board::Castling::BLACK_LONG)) {
+            if (!board.getField({B, 8}).has_value() && !board.getField({C, 8}).has_value() && !board.getField({D, 8}).has_value()) {
+                potentialMoves.push_back(Move{cp, currentField, {C, 8}, {MoveModifier::CASTLING_LONG}});
+            }
+        }
+        if (board.canCastle(Board::Castling::BLACK_SHORT)) {
+            if (!board.getField({F, 8}).has_value() && !board.getField({G, 8}).has_value()) {
+                potentialMoves.push_back(Move{cp, currentField, {G, 8}, {MoveModifier::CASTLING_SHORT}});
+            }
+        }
+    }
+    return potentialMoves;
+}
+
+bool ChessRules::isMoveLegal(const Board& board, const Move& potentialMove, bool ignoreCheck) {
+    // Todo: Castling needs to be checked if moves are allowed
+    return ignoreCheck || !wouldBeCheck(board, potentialMove);
 }

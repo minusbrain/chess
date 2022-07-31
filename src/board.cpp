@@ -7,7 +7,7 @@
 #include "move.h"
 #include "types.h"
 
-Board::Board(Board &orig)
+Board::Board(const Board &orig)
     : _board(orig._board), _canCastle(orig._canCastle), _enpassantTarget(orig._enpassantTarget), _turn(orig._turn) {}
 
 Board::Board() : _board(), _canCastle(0x00), _enpassantTarget(), _turn(Color::WHITE) {}
@@ -26,17 +26,15 @@ void Board::clearField(ChessFile file, ChessRank rank) { _board[BoardHelper::fie
 
 void Board::clearField(ChessField field) { clearField(std::get<ChessFileIdx>(field), std::get<ChessRankIdx>(field)); }
 
-std::optional<ChessPiece> Board::getField(ChessFile file, ChessRank rank) const {
-    return _board[BoardHelper::fieldToIndex({file, rank})];
-}
+std::optional<ChessPiece> Board::getField(ChessFile file, ChessRank rank) const { return _board[BoardHelper::fieldToIndex({file, rank})]; }
 
 std::optional<ChessPiece> Board::getField(ChessField field) const {
     return getField(std::get<ChessFileIdx>(field), std::get<ChessRankIdx>(field));
 }
 
 int BoardHelper::fieldToIndex(ChessField field) {
-    assert(std::get<ChessRankIdx>(field) > 0 && std::get<ChessRankIdx>(field) < 9 &&
-           std::get<ChessFileIdx>(field) > 0 && std::get<ChessFileIdx>(field) < 9);
+    assert(std::get<ChessRankIdx>(field) > 0 && std::get<ChessRankIdx>(field) < 9 && std::get<ChessFileIdx>(field) > 0 &&
+           std::get<ChessFileIdx>(field) < 9);
     return (std::get<ChessRankIdx>(field) - 1) * 8 + std::get<ChessFileIdx>(field) - 1;
 }
 
@@ -91,8 +89,7 @@ bool Board::applyMove(Move move) {
     if (!startPiece.has_value() || startPiece.value() != cp) {
         return false;
     }
-    if (endPiece.has_value() &&
-        (!move.hasModifier(MoveModifier::CAPTURE) || std::get<ColorIdx>(endPiece.value()) == movingColor)) {
+    if (endPiece.has_value() && (!move.hasModifier(MoveModifier::CAPTURE) || std::get<ColorIdx>(endPiece.value()) == movingColor)) {
         return false;
     }
     if (move.hasModifier(MoveModifier::EN_PASSANT)) {
@@ -117,6 +114,7 @@ bool Board::applyMove(Move move) {
     }
     clearField(sf);
     setField(ef, cp);
+    setTurn(movingColor == Color::WHITE ? Color::BLACK : Color::WHITE);
     return true;
 }
 
@@ -132,3 +130,12 @@ void Board::setEnPassantTarget(ChessField field) { _enpassantTarget = field; }
 
 Color Board::whosTurnIsIt() const { return _turn; }
 void Board::setTurn(Color color) { _turn = color; }
+
+std::optional<ChessField> Board::findFirstPiece(ChessPiece cp) const {
+    for (int i = 0; i < 64; ++i) {
+        if (_board[i].has_value() && _board[i].value() == cp) {
+            return BoardHelper::indexToField(i);
+        }
+    }
+    return std::nullopt;
+}
