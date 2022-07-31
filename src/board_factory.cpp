@@ -8,6 +8,49 @@
 #include "common_debug.h"
 #include "types.h"
 
+ChessField getChessFieldFromString(std::string str) {
+    char filechar = str[0];
+    char rankchar = str[1];
+
+    ChessFile file = A;
+    switch (filechar) {
+        case 'a':
+        case 'A':
+            file = A;
+            break;
+        case 'b':
+        case 'B':
+            file = B;
+            break;
+        case 'c':
+        case 'C':
+            file = C;
+            break;
+        case 'd':
+        case 'D':
+            file = D;
+            break;
+        case 'e':
+        case 'E':
+            file = E;
+            break;
+        case 'f':
+        case 'F':
+            file = F;
+            break;
+        case 'g':
+        case 'G':
+            file = G;
+            break;
+        case 'h':
+        case 'H':
+            file = H;
+            break;
+    }
+
+    return ChessField{file, rankchar - 0x30};
+}
+
 Board BoardFactory::createEmptyBoard() {
     Board board;
     return board;
@@ -55,7 +98,7 @@ Board BoardFactory::createStandardBoard() {
 }
 
 //           8/5k2/3p4/1p1Pp2p/pP2Pp1P/P4P1K/8/8 b - - 99 50
-
+// or        8/5k2/3p4/1p1Pp2p/pP2Pp1P/P4P1K/8/8
 // currently this assumes a valid FEN string and will fail in case of an invalid one
 // Todo: Sanity checks and implementation for EnPassant Target
 Board BoardFactory::creatBoardFromFEN(std::string fen) {
@@ -63,8 +106,8 @@ Board BoardFactory::creatBoardFromFEN(std::string fen) {
 
     std::vector<std::string> fields = base::split(fen, ' ');
     std::vector<std::string> ranks = base::split(fields[0], '/');
-    // fmt::print("\nFields: {}", fields);
-    // fmt::print("\nRanks: {}", ranks);
+    fmt::print("\nFields: {}", fields);
+    fmt::print("\nRanks: {}", ranks);
 
     int rank = 8;
     for (auto rankStr : ranks) {
@@ -91,6 +134,10 @@ Board BoardFactory::creatBoardFromFEN(std::string fen) {
         if (fields[2].find('K') != std::string::npos) board.setCastling(Board::Castling::WHITE_SHORT);
         if (fields[2].find('q') != std::string::npos) board.setCastling(Board::Castling::BLACK_LONG);
         if (fields[2].find('k') != std::string::npos) board.setCastling(Board::Castling::BLACK_SHORT);
+
+        if (fields[3] != "-") {
+            board.setEnPassantTarget(getChessFieldFromString(fields[3]));
+        }
     }
 
     return board;
