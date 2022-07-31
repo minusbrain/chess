@@ -1,0 +1,1 @@
+// k7/6Pp/4Pp2/1pP1P3/1Pp1p3/4pP2/2P3pP/K7 w - b3
