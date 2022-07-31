@@ -25,6 +25,7 @@ set (SOURCE_CPP
 set (TEST_SOURCE_CPP
 
    test/test_board.cpp
+   test/test_rules.cpp
 )
 
 include_directories(chess PRIVATE ext/fmt/include)
@@ -40,5 +41,7 @@ add_executable(test_chess ${TEST_SOURCE_CPP})
 target_link_libraries(test_chess PRIVATE chess GTest::gtest_main)
 
 add_test(Test_Chess test_chess)
+
+add_custom_target(chess_meta DEPENDS chess run_chess test_chess)
 
 install(TARGETS chess DESTINATION bin)
