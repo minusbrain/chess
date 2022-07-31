@@ -106,8 +106,8 @@ Board BoardFactory::creatBoardFromFEN(std::string fen) {
 
     std::vector<std::string> fields = base::split(fen, ' ');
     std::vector<std::string> ranks = base::split(fields[0], '/');
-    fmt::print("\nFields: {}", fields);
-    fmt::print("\nRanks: {}", ranks);
+    // fmt::print("\nFields: {}", fields);
+    // fmt::print("\nRanks: {}", ranks);
 
     int rank = 8;
     for (auto rankStr : ranks) {
