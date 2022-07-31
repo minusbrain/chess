@@ -125,7 +125,7 @@ void Board::setCastlingRaw(uint8_t value) { _canCastle.raw_set(value); }
 void Board::setCastling(Castling castling) { _canCastle.set(castling); }
 void Board::unsetCastling(Castling castling) { _canCastle.unset(castling); }
 
-std::optional<ChessField> Board::getEnPassantTarget() const { return _enpassantTarget.value(); }
+std::optional<ChessField> Board::getEnPassantTarget() const { return _enpassantTarget; }
 bool Board::hasEnPassantTarget() const { return _enpassantTarget.has_value(); };
 void Board::removeEnPassantTarget() { _enpassantTarget.reset(); }
 void Board::setEnPassantTarget(ChessField field) { _enpassantTarget = field; }
