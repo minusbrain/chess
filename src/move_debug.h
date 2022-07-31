@@ -3,6 +3,7 @@
 #include <fmt/format.h>
 
 #include <cctype>
+#include <iterator>
 
 #include "board.h"
 #include "common_debug.h"
@@ -86,10 +87,10 @@ inline std::string optionalMoveSuffixes(Move move) {
  */
 template <>
 struct fmt::formatter<Move> {
-    constexpr auto parse(format_parse_context &ctx) { return ctx.begin(); }
+    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
 
     template <typename FormatContext>
-    auto format(const Move &move, FormatContext &ctx) {
+    auto format(const Move& move, FormatContext& ctx) {
         if (move.hasModifier(MoveModifier::CASTLING_SHORT)) {
             return format_to(ctx.out(), "0-0");
         } else if (move.hasModifier(MoveModifier::CASTLING_LONG)) {
@@ -103,3 +104,18 @@ struct fmt::formatter<Move> {
         }
     }
 };
+
+inline std::ostream& operator<<(std::ostream& os, const Move& move) {
+    if (move.hasModifier(MoveModifier::CASTLING_SHORT)) {
+        os << "0-0";
+    } else if (move.hasModifier(MoveModifier::CASTLING_LONG)) {
+        os << "0-0-0";
+    } else {
+        auto cp = move.getChessPiece();
+        auto sf = move.getStartField();
+        auto ef = move.getEndField();
+        os << chessPieceToLAN(cp) << chessFieldToLAN(sf) << optionalCaptureIndicator(move) << chessFieldToLAN(ef)
+           << optionalMoveSuffixes(move);
+    }
+    return os;
+}
