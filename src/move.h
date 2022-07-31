@@ -26,6 +26,7 @@ class Move {
     void addModifier(MoveModifier mod);
     std::set<MoveModifier> getModifiers() const;
     bool hasModifier(MoveModifier mod) const;
+    void clearModifiers();
 
     ChessPiece getChessPiece() const;
     ChessField getStartField() const;

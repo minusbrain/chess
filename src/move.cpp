@@ -9,6 +9,7 @@ Move::Move(ChessPiece piece, ChessFile startLine, ChessRank startRow, ChessFile 
     : _piece(piece), _startField{startLine, startRow}, _endField{endLine, endRow}, _mods(mods) {}
 
 void Move::addModifier(MoveModifier mod) { _mods.insert(mod); }
+void Move::clearModifiers() { _mods.clear(); }
 std::set<MoveModifier> Move::getModifiers() const { return _mods; }
 bool Move::hasModifier(MoveModifier mod) const { return base::find(_mods, mod) != _mods.end(); }
 
