@@ -4,6 +4,7 @@
 
 #include "board.h"
 #include "common_debug.h"
+#include "types.h"
 
 /**
  * @brief Allows printing out chess-pieces with fmt
@@ -17,6 +18,21 @@ struct fmt::formatter<ChessPiece> {
     template <typename FormatContext>
     auto format(const ChessPiece &p, FormatContext &ctx) {
         return format_to(ctx.out(), "{}", getDebugCharForPiece(p));
+    }
+};
+
+/**
+ * @brief Allows printing out chess-field with fmt
+ *
+ * @tparam ChessField
+ */
+template <>
+struct fmt::formatter<ChessField> {
+    constexpr auto parse(format_parse_context &ctx) { return ctx.begin(); }
+
+    template <typename FormatContext>
+    auto format(const ChessField &f, FormatContext &ctx) {
+        return format_to(ctx.out(), "{}{}", std::get<ChessFileIdx>(f), std::get<ChessRankIdx>(f));
     }
 };
 
