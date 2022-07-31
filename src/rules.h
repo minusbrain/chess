@@ -6,17 +6,17 @@
 
 class ChessRules {
    public:
-    static std::vector<Move> getAllValidMoves(Board board, Color color);
-    static std::vector<Move> getAllValidMoves(Board board, ChessPieceOnField pieceOnField);
+    static std::vector<Move> getAllValidMoves(const Board& board);
+    static std::vector<Move> getAllValidMoves(const Board& board, ChessPieceOnField pieceOnField);
 
-    static bool isCheck(Board board, Color color);
+    static bool isCheck(const Board& board, Color color);
 
-    static std::vector<Move> getPotentialMoves(Board board, ChessPieceOnField pieceOnField);
-    static std::vector<Move> getPotentialPawnMoves(Board board, ChessPieceOnField pieceOnField);
-    static std::vector<Move> getPotentialRookMoves(Board board, ChessPieceOnField pieceOnField);
-    static std::vector<Move> getPotentialKnightMoves(Board board, ChessPieceOnField pieceOnField);
-    static std::vector<Move> getPotentialBishopMoves(Board board, ChessPieceOnField pieceOnField);
-    static std::vector<Move> getPotentialQueenMoves(Board board, ChessPieceOnField pieceOnField);
-    static std::vector<Move> getPotentialKingMoves(Board board, ChessPieceOnField pieceOnField);
-    static bool isMoveLegal(Board board, Move potentialMove);
+    static std::vector<Move> getPotentialMoves(const Board& board, ChessPieceOnField pieceOnField);
+    static std::vector<Move> getPotentialPawnMoves(const Board& board, ChessPieceOnField pieceOnField);
+    static std::vector<Move> getPotentialRookMoves(const Board& board, ChessPieceOnField pieceOnField);
+    static std::vector<Move> getPotentialKnightMoves(const Board& board, ChessPieceOnField pieceOnField);
+    static std::vector<Move> getPotentialBishopMoves(const Board& board, ChessPieceOnField pieceOnField);
+    static std::vector<Move> getPotentialQueenMoves(const Board& board, ChessPieceOnField pieceOnField);
+    static std::vector<Move> getPotentialKingMoves(const Board& board, ChessPieceOnField pieceOnField);
+    static bool isMoveLegal(const Board& board, Move potentialMove);
 };

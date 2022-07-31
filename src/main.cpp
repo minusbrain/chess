@@ -20,7 +20,7 @@ int main(int argc, char** argv) {
     fmt::print("\nFEN String {}\n", fen);
     fmt::print("FEN Board:\n{:b}\n", fenBoard);
 
-    auto validMoves = ChessRules::getAllValidMoves(fenBoard, fenBoard.whosTurnIsIt());
+    auto validMoves = ChessRules::getAllValidMoves(fenBoard);
 
     fmt::print("Valid moves for {}:\n", (fenBoard.whosTurnIsIt() == Color::WHITE ? "white" : "black"));
     for (auto validMove : validMoves) {

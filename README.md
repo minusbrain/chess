@@ -50,7 +50,7 @@ This is work in progress
 * Represent chess moves (class Move)
 * Apply a chess move to a board
 * Display a chess move in Long Algebraic Notation
-* Determine potential pawn and rook moves for a given board
+* Determine potential pawn, rook, bishop, queen moves for a given board
 * En Passant moves
 * Promotion moves
 
@@ -59,7 +59,7 @@ This is work in progress
 * Play a chess game (neither for humans or CPUs)
 * Support any kind of GUI
 * Manipulate a board via command line
-* Determine bishop, knight, queen or king moves
+* Determine knight or king moves
 * Respect check or check mate while determining potential moves
 * Castling moves
 
