@@ -23,6 +23,8 @@ class Move {
     Move(ChessPiece piece, ChessFile startLine, ChessRank startRow, ChessFile endLine, ChessRank endRow,
          std::set<MoveModifier> mods = {});
 
+    bool operator==(const Move& other) const = default;
+
     void addModifier(MoveModifier mod);
     std::set<MoveModifier> getModifiers() const;
     bool hasModifier(MoveModifier mod) const;
