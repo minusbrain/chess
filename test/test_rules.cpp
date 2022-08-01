@@ -144,3 +144,13 @@ TEST(TestChessRules, PawnPositions_PawnCanPromoteByCapture_FindAllPossibleBlackM
     EXPECT_CONTAINS(Move{{Color::BLACK, Piece::PAWN}, {D, 2}, {C, 1}, {MoveModifier::PROMOTE_QUEEN, MoveModifier::CAPTURE}}, moves);
     EXPECT_EQ(4, getNumberOfMovesForPiece(moves, {Color::BLACK, Piece::PAWN}));
 }
+
+TEST(TestChessRules, PawnPositions_PawnCanCaptureEnPassant_FindAllPossibleWhiteMoves) {
+    Board board = BoardFactory::creatBoardFromFEN("k7/8/8/8/3Pp3/8/8/K7 b - d3");
+
+    auto moves = ChessRules::getAllValidMoves(board);
+
+    EXPECT_CONTAINS(Move{{Color::BLACK, Piece::PAWN}, {E, 4}, {E, 3}}, moves);
+    EXPECT_CONTAINS(Move{{Color::BLACK, Piece::PAWN}, {E, 4}, {D, 3}, {MoveModifier::CAPTURE, MoveModifier::EN_PASSANT}}, moves);
+    EXPECT_EQ(2, getNumberOfMovesForPiece(moves, {Color::BLACK, Piece::PAWN}));
+}
