@@ -71,11 +71,6 @@ std::optional<ChessField> determineEnPassantCaptureTarget(ChessField start, Ches
 }
 
 bool Board::applyMove(Move move) {
-    // TODO:
-    // castling
-    //  * and promotions are done properly but no rules are being checked if those are legal. Just that
-    //  * the pieces involved in the move are actually present and there end fields are free or an enemy
-    //  * to be captures is there.
     auto cp = move.getChessPiece();
     Color movingColor = std::get<ColorIdx>(cp);
     auto sf = move.getStartField();
@@ -110,8 +105,48 @@ bool Board::applyMove(Move move) {
         }
         clearField(epFieldOpt.value());
     } else if (move.hasModifier(MoveModifier::CASTLING_LONG) || move.hasModifier(MoveModifier::CASTLING_SHORT)) {
-        return false;
+        ChessRank castlingRank = (movingColor == Color::WHITE ? 1 : 8);
+
+        if (move.hasModifier(MoveModifier::CASTLING_LONG)) {
+            if (getField({B, castlingRank}).has_value() || getField({C, castlingRank}).has_value() ||
+                getField({D, castlingRank}).has_value()) {
+                return false;
+            }
+
+            if (!getField({A, castlingRank}).has_value() || getField({A, castlingRank}).value() != ChessPiece{movingColor, Piece::ROOK}) {
+                return false;
+            }
+
+            if (!getField({E, castlingRank}).has_value() || getField({E, castlingRank}).value() != ChessPiece{movingColor, Piece::KING}) {
+                return false;
+            }
+            clearField({A, castlingRank});
+            setField({D, castlingRank}, {movingColor, Piece::ROOK});
+        } else {
+            if (getField({F, castlingRank}).has_value() || getField({G, castlingRank}).has_value()) {
+                return false;
+            }
+
+            if (!getField({H, castlingRank}).has_value() || getField({H, castlingRank}).value() != ChessPiece{movingColor, Piece::ROOK}) {
+                return false;
+            }
+
+            if (!getField({E, castlingRank}).has_value() || getField({E, castlingRank}).value() != ChessPiece{movingColor, Piece::KING}) {
+                return false;
+            }
+            clearField({H, castlingRank});
+            setField({F, castlingRank}, {movingColor, Piece::ROOK});
+        }
+    } else if (move.hasModifier(MoveModifier::PROMOTE_QUEEN)) {
+        std::get<PieceIdx>(cp) = Piece::QUEEN;
+    } else if (move.hasModifier(MoveModifier::PROMOTE_BISHOP)) {
+        std::get<PieceIdx>(cp) = Piece::BISHOP;
+    } else if (move.hasModifier(MoveModifier::PROMOTE_KNIGHT)) {
+        std::get<PieceIdx>(cp) = Piece::KNIGHT;
+    } else if (move.hasModifier(MoveModifier::PROMOTE_ROOK)) {
+        std::get<PieceIdx>(cp) = Piece::ROOK;
     }
+
     clearField(sf);
     setField(ef, cp);
     setTurn(movingColor == Color::WHITE ? Color::BLACK : Color::WHITE);
