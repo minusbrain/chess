@@ -53,6 +53,7 @@ This is work in progress
 * Determine potential moves for a given board
 * En Passant moves
 * Promotion moves
+* Castling moves
 
 ## What the library can't do yet
 
@@ -60,7 +61,6 @@ This is work in progress
 * Support any kind of GUI
 * Manipulate a board via command line
 * Detect check-mate
-* Castling moves
 * Be properly tested  ;-)
 
 # Licenses and external dependencies

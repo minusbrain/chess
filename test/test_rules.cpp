@@ -177,3 +177,21 @@ TEST(TestChessRules, Castling_BlackKingPathCoveredByEnemy_ExpectNoCastlingOption
     EXPECT_DOESNOT_CONTAIN(Move{{Color::BLACK, Piece::KING}, {E, 8}, {G, 8}, {MoveModifier::CASTLING_SHORT}}, moves);
     EXPECT_DOESNOT_CONTAIN(Move{{Color::BLACK, Piece::KING}, {E, 8}, {C, 8}, {MoveModifier::CASTLING_LONG}}, moves);
 }
+
+TEST(TestChessRules, Castling_WhiteKingEndfieldoveredByEnemy_ExpectNoCastlingOptions) {
+    Board board = BoardFactory::createBoardFromFEN("2r3r1/8/8/8/8/8/8/R3K2R w QK -");
+
+    auto moves = ChessRules::getAllValidMoves(board);
+
+    EXPECT_DOESNOT_CONTAIN(Move{{Color::WHITE, Piece::KING}, {E, 1}, {G, 1}, {MoveModifier::CASTLING_SHORT}}, moves);
+    EXPECT_DOESNOT_CONTAIN(Move{{Color::WHITE, Piece::KING}, {E, 1}, {C, 1}, {MoveModifier::CASTLING_LONG}}, moves);
+}
+
+TEST(TestChessRules, Castling_WhiteKingCastlingCoveredByPawns_ExpectNoCastlingOptions) {
+    Board board = BoardFactory::createBoardFromFEN("8/8/8/8/8/8/3p2p1/R3K2R w QK -");
+
+    auto moves = ChessRules::getAllValidMoves(board);
+
+    EXPECT_DOESNOT_CONTAIN(Move{{Color::WHITE, Piece::KING}, {E, 1}, {G, 1}, {MoveModifier::CASTLING_SHORT}}, moves);
+    EXPECT_DOESNOT_CONTAIN(Move{{Color::WHITE, Piece::KING}, {E, 1}, {C, 1}, {MoveModifier::CASTLING_LONG}}, moves);
+}
