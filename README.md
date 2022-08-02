@@ -27,7 +27,7 @@ manually.
 ## Prerequisites
 
 * C++20 compatible compiler (might work with older standards, I did not check)
-* cmake >= 3.23 (might work with older versions, I did not check)
+* cmake >= 3.10
 * googletest installed
 
 ## Build
@@ -61,6 +61,7 @@ This is work in progress
 * Manipulate a board via command line
 * Detect check-mate
 * Castling moves
+* Be properly tested  ;-)
 
 # Licenses and external dependencies
 

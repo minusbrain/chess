@@ -15,7 +15,7 @@ int main(int argc, char** argv) {
         fen = "8/5k2/3p4/1p1Pp2p/pP2Pp1P/P4P1K/8/8 b - - 99 50";
     }
 
-    Board fenBoard = BoardFactory::creatBoardFromFEN(fen);
+    Board fenBoard = BoardFactory::createBoardFromFEN(fen);
 
     fmt::print("\nFEN String {}\n", fen);
     fmt::print("FEN Board:\n{:b}\n", fenBoard);

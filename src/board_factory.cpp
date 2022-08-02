@@ -100,8 +100,8 @@ Board BoardFactory::createStandardBoard() {
 //           8/5k2/3p4/1p1Pp2p/pP2Pp1P/P4P1K/8/8 b - - 99 50
 // or        8/5k2/3p4/1p1Pp2p/pP2Pp1P/P4P1K/8/8
 // currently this assumes a valid FEN string and will fail in case of an invalid one
-// Todo: Sanity checks and implementation for EnPassant Target
-Board BoardFactory::creatBoardFromFEN(std::string fen) {
+// Todo: Sanity checks
+Board BoardFactory::createBoardFromFEN(std::string fen) {
     Board board;
 
     std::vector<std::string> fields = base::split(fen, ' ');

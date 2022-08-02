@@ -35,5 +35,5 @@ class BoardFactory {
      *
      * @return Created chess-board
      */
-    static Board creatBoardFromFEN(std::string fen);
+    static Board createBoardFromFEN(std::string fen);
 };

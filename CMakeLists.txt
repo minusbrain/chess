@@ -23,7 +23,6 @@ set (SOURCE_CPP
 )
 
 set (TEST_SOURCE_CPP
-
    test/test_board.cpp
    test/test_rules.cpp
 )
