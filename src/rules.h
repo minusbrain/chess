@@ -19,5 +19,7 @@ class ChessRules {
     static std::vector<Move> getPotentialBishopMoves(const Board& board, ChessPieceOnField pieceOnField);
     static std::vector<Move> getPotentialQueenMoves(const Board& board, ChessPieceOnField pieceOnField);
     static std::vector<Move> getPotentialKingMoves(const Board& board, ChessPieceOnField pieceOnField);
+
+    static bool isCastlingIllegal(const Board& board, const Move& potentialMove);
     static bool isMoveLegal(const Board& board, const Move& potentialMove, bool ignoreCheck);
 };

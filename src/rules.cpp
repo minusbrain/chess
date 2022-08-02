@@ -29,8 +29,15 @@ bool ChessRules::isCheck(const Board& board) {
         return false;
 };
 
+int numOfPotentialMovesCoveringField(const Board& board, ChessField field) {
+    std::vector<Move> validMoves = ChessRules::getAllValidMoves(board, true);
+    int numOfKingCaptureMoves = base::count_if(
+        validMoves, [&field](const Move& move) { return (move.getEndField() == field && move.hasModifier(MoveModifier::CAPTURE)); });
+
+    return numOfKingCaptureMoves;
+}
+
 bool ChessRules::wouldBeCheck(const Board& board, const Move& move) {
-    std::vector<Move> validMoves;
     Color color = board.whosTurnIsIt();
 
     Board otherPlayerBoard(board);
@@ -39,10 +46,7 @@ bool ChessRules::wouldBeCheck(const Board& board, const Move& move) {
     assert(kingFieldOpt.has_value());
     ChessField kingField = kingFieldOpt.value();
 
-    validMoves = ChessRules::getAllValidMoves(otherPlayerBoard, true);
-    int numOfKingCaptureMoves = base::count_if(validMoves, [&kingField](const Move& move) {
-        return (move.getEndField() == kingField && move.hasModifier(MoveModifier::CAPTURE));
-    });
+    int numOfKingCaptureMoves = numOfPotentialMovesCoveringField(otherPlayerBoard, kingField);
 
     if (numOfKingCaptureMoves > 0)
         return true;
@@ -359,7 +363,28 @@ std::vector<Move> ChessRules::getPotentialKingMoves(const Board& board, ChessPie
     return potentialMoves;
 }
 
+bool ChessRules::isCastlingIllegal(const Board& board, const Move& potentialMove) {
+    Color movingColor = std::get<ColorIdx>(potentialMove.getChessPiece());
+    ChessRank castlingRank = (movingColor == Color::WHITE ? 1 : 8);
+
+    if (potentialMove.hasModifier(MoveModifier::CASTLING_LONG)) {
+        if (board.getField({B, castlingRank}).has_value() || board.getField({C, castlingRank}).has_value() ||
+            board.getField({D, castlingRank}).has_value()) {
+            return true;
+        }
+    } else if (potentialMove.hasModifier(MoveModifier::CASTLING_SHORT)) {
+        if (board.getField({F, castlingRank}).has_value() || board.getField({G, castlingRank}).has_value()) {
+            return true;
+        }
+    }
+
+    return true;
+}
+
 bool ChessRules::isMoveLegal(const Board& board, const Move& potentialMove, bool ignoreCheck) {
-    // Todo: Castling needs to be checked if moves are allowed
-    return ignoreCheck || !wouldBeCheck(board, potentialMove);
+    bool illegalCastling = false;
+    if (potentialMove.hasModifier(MoveModifier::CASTLING_LONG), potentialMove.hasModifier(MoveModifier::CASTLING_SHORT)) {
+        illegalCastling = isCastlingIllegal(board, potentialMove);
+    }
+    return ignoreCheck || !wouldBeCheck(board, potentialMove) || illegalCastling;
 }
