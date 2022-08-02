@@ -29,6 +29,15 @@ bool ChessRules::isCheck(const Board& board) {
         return false;
 };
 
+bool ChessRules::isCheckMate(const Board& board) {
+    // Todo Properly implement. We need some kind of caching for Board -> Moves -> Resulting boards
+    if (!isCheck(board)) {
+        return false;
+    }
+
+    return false;
+};
+
 int numOfPotentialMovesCoveringField(const Board& board, ChessField field) {
     std::vector<Move> validMoves = ChessRules::getAllValidMoves(board, true);  // true = do not ignore positions moving yourself into check
     int numOfCaptureMoves = base::count_if(
@@ -52,6 +61,14 @@ bool ChessRules::wouldBeCheck(const Board& board, const Move& move) {
         return true;
     else
         return false;
+};
+
+bool ChessRules::wouldBeCheckMate(const Board& board, const Move& move) {
+    // Todo Properly implement. We need some kind of caching for Board -> Moves -> Resulting boards
+    if (!wouldBeCheck(board, move)) {
+        return false;
+    }
+    return false;
 };
 
 std::vector<Move> ChessRules::getAllValidMoves(const Board& board, bool ignoreCheck) {

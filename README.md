@@ -61,6 +61,8 @@ This is work in progress
 * Support any kind of GUI
 * Manipulate a board via command line
 * Detect check-mate
+* Annotate moves with check, check-mate or stale-mate
+* Implement board -> possible moves -> check/check-mate/stale-mate information caching
 * Be properly tested  ;-)
 
 # Licenses and external dependencies

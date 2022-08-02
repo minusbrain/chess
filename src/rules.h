@@ -11,6 +11,8 @@ class ChessRules {
 
     static bool isCheck(const Board& board);
     static bool wouldBeCheck(const Board& board, const Move& move);
+    static bool isCheckMate(const Board& board);
+    static bool wouldBeCheckMate(const Board& board, const Move& move);
 
     static std::vector<Move> getPotentialMoves(const Board& board, ChessPieceOnField pieceOnField);
     static std::vector<Move> getPotentialPawnMoves(const Board& board, ChessPieceOnField pieceOnField);
