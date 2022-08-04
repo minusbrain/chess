@@ -36,4 +36,11 @@ class BoardFactory {
      * @return Created chess-board
      */
     static Board createBoardFromFEN(std::string fen);
+
+    /**
+     * @brief Creates a chess-board from an existing board and a move thats applied to it
+     *
+     * @return Created chess-board
+     */
+    static Board createBoardByMoveApplication(const Board& orig, const Move& move);
 };

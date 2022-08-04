@@ -5,6 +5,7 @@
 #include <cassert>
 
 #include "board.h"
+#include "board_factory.h"
 #include "move.h"
 #include "move_debug.h"
 #include "types.h"
@@ -49,8 +50,7 @@ int numOfPotentialMovesCoveringField(const Board& board, ChessField field) {
 bool ChessRules::wouldBeCheck(const Board& board, const Move& move) {
     Color color = board.whosTurnIsIt();
 
-    Board otherPlayerBoard(board);
-    assert(otherPlayerBoard.applyMove(move) == true);
+    Board otherPlayerBoard = BoardFactory::createBoardByMoveApplication(board, move);
     std::optional<ChessField> kingFieldOpt = otherPlayerBoard.findFirstPiece({color, Piece::KING});
     assert(kingFieldOpt.has_value());
     ChessField kingField = kingFieldOpt.value();

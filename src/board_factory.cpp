@@ -142,3 +142,9 @@ Board BoardFactory::createBoardFromFEN(std::string fen) {
 
     return board;
 }
+
+Board BoardFactory::createBoardByMoveApplication(const Board& orig, const Move& move) {
+    Board board(orig);
+    assert(board.applyMove(move));
+    return board;
+}
