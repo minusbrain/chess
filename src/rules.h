@@ -24,4 +24,6 @@ class ChessRules {
 
     static bool isCastlingIllegal(const Board& board, const Move& potentialMove);
     static bool isMoveLegal(const Board& board, const Move& potentialMove, bool ignoreCheck);
+
+    static bool isBoardPositionLegal(const Board& board);
 };

@@ -12,7 +12,9 @@
 
 bool ChessRules::isCheck(const Board& board) {
     std::vector<Move> validMovesOtherColor;
-    std::optional<ChessField> kingFieldOpt = board.findFirstPiece({board.whosTurnIsIt(), Piece::KING});
+    std::optional<ChessField> kingFieldOpt = board.findFirstPiece([&board](ChessPiece cp) {
+        return cp == ChessPiece{board.whosTurnIsIt(), Piece::KING};
+    });
     assert(kingFieldOpt.has_value());
     ChessField kingField = kingFieldOpt.value();
 
@@ -51,7 +53,9 @@ bool ChessRules::wouldBeCheck(const Board& board, const Move& move) {
     Color color = board.whosTurnIsIt();
 
     Board otherPlayerBoard = BoardFactory::createBoardByMoveApplication(board, move);
-    std::optional<ChessField> kingFieldOpt = otherPlayerBoard.findFirstPiece({color, Piece::KING});
+    std::optional<ChessField> kingFieldOpt = otherPlayerBoard.findFirstPiece([color](ChessPiece cp) {
+        return cp == ChessPiece{color, Piece::KING};
+    });
     assert(kingFieldOpt.has_value());
     ChessField kingField = kingFieldOpt.value();
 
@@ -414,4 +418,9 @@ bool ChessRules::isMoveLegal(const Board& board, const Move& potentialMove, bool
         }
     }
     return ignoreCheck || !wouldBeCheck(board, potentialMove);
+}
+
+bool ChessRules::isBoardPositionLegal(const Board& board) {
+    (void)board;
+    return true;
 }

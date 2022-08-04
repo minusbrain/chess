@@ -7,7 +7,7 @@
 #include "move.h"
 #include "types.h"
 
-Board::Board(const Board &orig)
+Board::Board(const Board& orig)
     : _board(orig._board), _canCastle(orig._canCastle), _enpassantTarget(orig._enpassantTarget), _turn(orig._turn) {}
 
 Board::Board() : _board(), _canCastle(0x00), _enpassantTarget(), _turn(Color::WHITE) {}
@@ -166,11 +166,16 @@ void Board::setEnPassantTarget(ChessField field) { _enpassantTarget = field; }
 Color Board::whosTurnIsIt() const { return _turn; }
 void Board::setTurn(Color color) { _turn = color; }
 
-std::optional<ChessField> Board::findFirstPiece(ChessPiece cp) const {
+std::optional<ChessField> Board::findFirstPiece(const std::function<bool(ChessPiece)>& predicate) const {
     for (int i = 0; i < 64; ++i) {
-        if (_board[i].has_value() && _board[i].value() == cp) {
+        if (_board[i].has_value() && predicate(_board[i].value())) {
             return BoardHelper::indexToField(i);
         }
     }
     return std::nullopt;
+}
+
+int Board::countAllPieces(const std::function<bool(ChessPiece)>& predicate) const {
+    (void)predicate;
+    return 0;
 }

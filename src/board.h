@@ -3,6 +3,7 @@
 
 #include <array>
 #include <cstdint>
+#include <functional>
 #include <optional>
 #include <vector>
 
@@ -167,7 +168,8 @@ class Board {
     Color whosTurnIsIt() const;
     void setTurn(Color);
 
-    std::optional<ChessField> findFirstPiece(ChessPiece cp) const;
+    std::optional<ChessField> findFirstPiece(const std::function<bool(ChessPiece)>& predicate) const;
+    int countAllPieces(const std::function<bool(ChessPiece)>& predicate) const;
 
    private:
     bool isInBounds(ChessField field);
