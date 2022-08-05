@@ -39,9 +39,12 @@ release/
 debug/
 bin/
 lib/
+html/
+latex/
 
 # Other
 *.pyc
+*.gdb_history
 
 # Sublime
 *.sublime-workspace
