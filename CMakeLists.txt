@@ -17,6 +17,7 @@ enable_testing()
 
 set (SOURCE_CPP
    src/board.cpp
+   src/piece_rules.cpp
    src/move.cpp
    src/rules.cpp
    src/board_factory.cpp

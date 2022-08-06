@@ -1,9 +1,10 @@
 #pragma once
 #include <vector>
 
-#include "board.h"
-#include "move.h"
 #include "types.h"
+
+class Board;
+class Move;
 
 class ChessRules {
    public:
@@ -16,12 +17,6 @@ class ChessRules {
     static bool wouldBeCheckMate(const Board& board, const Move& move);
 
     static std::vector<Move> getPotentialMoves(const Board& board, ChessPieceOnField pieceOnField);
-    static std::vector<Move> getPotentialPawnMoves(const Board& board, ChessPieceOnField pieceOnField);
-    static std::vector<Move> getPotentialRookMoves(const Board& board, ChessPieceOnField pieceOnField);
-    static std::vector<Move> getPotentialKnightMoves(const Board& board, ChessPieceOnField pieceOnField);
-    static std::vector<Move> getPotentialBishopMoves(const Board& board, ChessPieceOnField pieceOnField);
-    static std::vector<Move> getPotentialQueenMoves(const Board& board, ChessPieceOnField pieceOnField);
-    static std::vector<Move> getPotentialKingMoves(const Board& board, ChessPieceOnField pieceOnField);
 
     static bool isCastlingIllegal(const Board& board, const Move& potentialMove);
     static bool isMoveLegal(const Board& board, const Move& potentialMove, IgnoreCheck ignoreCheck);

@@ -7,8 +7,9 @@
 #include <optional>
 #include <vector>
 
-#include "move.h"
 #include "types.h"
+
+class Move;
 
 class BoardHelper {
    public:

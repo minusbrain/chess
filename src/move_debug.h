@@ -5,7 +5,6 @@
 #include <cctype>
 #include <iterator>
 
-#include "board.h"
 #include "common_debug.h"
 #include "move.h"
 
@@ -99,8 +98,8 @@ struct fmt::formatter<Move> {
             auto cp = move.getChessPiece();
             auto sf = move.getStartField();
             auto ef = move.getEndField();
-            return format_to(ctx.out(), "{}{}{}{}{}", chessPieceToLAN(cp), chessFieldToLAN(sf),
-                             optionalCaptureIndicator(move), chessFieldToLAN(ef), optionalMoveSuffixes(move));
+            return format_to(ctx.out(), "{}{}{}{}{}", chessPieceToLAN(cp), chessFieldToLAN(sf), optionalCaptureIndicator(move),
+                             chessFieldToLAN(ef), optionalMoveSuffixes(move));
         }
     }
 };
