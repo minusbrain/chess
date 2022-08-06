@@ -99,7 +99,6 @@ std::vector<Move> ChessRules::getAllPotentialMoves(const Board& board) {
 }
 
 // TODO: Refactor to use polymorphic approach to get movement options per piece
-// Checked for hidden recursion: NO
 std::vector<Move> ChessRules::getPotentialMoves(const Board& board, ChessPieceOnField pieceOnField) {
     ChessPiece cp = std::get<ChessPieceIdx>(pieceOnField);
     Piece piece = std::get<PieceIdx>(cp);
@@ -130,7 +129,6 @@ std::vector<Move> ChessRules::getPotentialMoves(const Board& board, ChessPieceOn
     return {};
 }
 
-// Checked for hidden recursion: NO
 std::vector<Move> ChessRules::getPotentialPawnMoves(const Board& board, ChessPieceOnField pieceOnField) {
     std::vector<Move> potentialMoves;
 
@@ -239,7 +237,6 @@ std::vector<Move> ChessRules::getPotentialPawnMoves(const Board& board, ChessPie
     return potentialMoves;
 }
 
-// Checked for hidden recursion: NO
 bool addMoveOrIsBlocked(const Board& board, ChessField potentialMoveField, std::vector<Move>& potentialMoves,
                         const ChessPieceOnField& pieceOnField) {
     ChessPiece cp = std::get<ChessPieceIdx>(pieceOnField);
@@ -261,7 +258,6 @@ bool addMoveOrIsBlocked(const Board& board, ChessField potentialMoveField, std::
     return false;
 }
 
-// Checked for hidden recursion: NO
 std::vector<Move> ChessRules::getPotentialRookMoves(const Board& board, ChessPieceOnField pieceOnField) {
     std::vector<Move> potentialMoves;
     ChessField currentField = std::get<ChessFieldIdx>(pieceOnField);
@@ -291,7 +287,6 @@ std::vector<Move> ChessRules::getPotentialRookMoves(const Board& board, ChessPie
     return potentialMoves;
 }
 
-// Checked for hidden recursion: NO
 std::vector<Move> ChessRules::getPotentialKnightMoves(const Board& board, ChessPieceOnField pieceOnField) {
     std::vector<Move> potentialMoves;
     ChessField currentField = std::get<ChessFieldIdx>(pieceOnField);
@@ -310,7 +305,6 @@ std::vector<Move> ChessRules::getPotentialKnightMoves(const Board& board, ChessP
     return potentialMoves;
 }
 
-// Checked for hidden recursion: NO
 std::vector<Move> ChessRules::getPotentialBishopMoves(const Board& board, ChessPieceOnField pieceOnField) {
     std::vector<Move> potentialMoves;
     ChessField currentField = std::get<ChessFieldIdx>(pieceOnField);
@@ -340,7 +334,6 @@ std::vector<Move> ChessRules::getPotentialBishopMoves(const Board& board, ChessP
     return potentialMoves;
 }
 
-// Checked for hidden recursion: NO
 std::vector<Move> ChessRules::getPotentialQueenMoves(const Board& board, ChessPieceOnField pieceOnField) {
     std::vector<Move> potentialMoves;
     base::push_back(potentialMoves, getPotentialRookMoves(board, pieceOnField));
@@ -349,7 +342,6 @@ std::vector<Move> ChessRules::getPotentialQueenMoves(const Board& board, ChessPi
     return potentialMoves;
 }
 
-// Checked for hidden recursion: NO
 std::vector<Move> ChessRules::getPotentialKingMoves(const Board& board, ChessPieceOnField pieceOnField) {
     std::vector<Move> potentialMoves;
     ChessPiece cp = std::get<ChessPieceIdx>(pieceOnField);
@@ -425,8 +417,7 @@ bool ChessRules::isMoveLegal(const Board& board, const Move& potentialMove, Igno
     return ignoreCheck == IgnoreCheck::YES || !wouldBeCheck(board, potentialMove);
 }
 
-// Todo applyMove in rules. set / unset EnPassant, unset Castling, ...
-// Checked for hidden recursion: NO
+// Todo applyMove in rules. set / unset EnPassant ...
 bool ChessRules::applyMove(Board& board, const Move& move) {
     assert(determineBoardPositionLegality(board) == Legality::LEGAL);
     auto cp = move.getChessPiece();
@@ -540,16 +531,26 @@ bool ChessRules::applyMove(Board& board, const Move& move) {
         }
     }
 
+    if (piece == Piece::PAWN) {
+        int distance = std::abs(std::get<ChessRankIdx>(ef) - std::get<ChessRankIdx>(sf));
+        if (distance == 2) {
+            board.setEnPassantTarget(
+                ChessField{std::get<ChessFileIdx>(sf), std::get<ChessRankIdx>(sf) + (movingColor == Color::WHITE ? 1 : -1)});
+        } else {
+            board.removeEnPassantTarget();
+        }
+    } else {
+        board.removeEnPassantTarget();
+    }
+
     board.clearField(sf);
     board.setField(ef, cp);
     board.setTurn(movingColor == Color::WHITE ? Color::BLACK : Color::WHITE);
-    board.removeEnPassantTarget();
     assert(determineBoardPositionLegality(board) == Legality::LEGAL);
     return true;
 }
 
 // IDEA: Return reason for illegal verdict
-// Checked for hidden recursion: NO
 Legality ChessRules::determineBoardPositionLegality(Board& board) {
     if (board.getLegality() != Legality::UNDETERMINED) {
         return board.getLegality();
