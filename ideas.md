@@ -5,4 +5,4 @@
 * Add support for UCI https://www.shredderchess.com/chess-features/uci-universal-chess-interface.html
     * Accept board states as UCI string
 * Collect debug output in one file and move as much as possible into a source file
-* 
+* Integrate Doxygen into CMake: https://www.codeintrinsic.com/integrate-doxygen-with-cmake/

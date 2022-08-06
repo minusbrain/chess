@@ -27,6 +27,10 @@ class BoardHelper {
      * @returns    Field (File and Rank) matching the index
      */
     static ChessField indexToField(int index);
+
+    static bool isInBounds(ChessField field);
+
+    static std::optional<ChessField> determineEnPassantCaptureTarget(ChessField start, ChessField end);
 };
 
 /**
@@ -53,7 +57,7 @@ class Board {
      */
     ~Board();
 
-    bool operator==(const Board& other) const = default;
+    bool operator==(const Board& other) const;
 
     /**
      * @brief Set a chess-piece on a field of the board
@@ -138,22 +142,6 @@ class Board {
      */
     std::vector<ChessPieceOnField> getAllPieces(Color color) const;
 
-    /**
-     * @brief Applies the requested move. Only very rudimentary checks are applied
-     *
-     * Applies the move. Removes the piece from the old field. Sets the piece to the new field
-     * Neither field must be out of bounds. startField must actually contain the piece. endField
-     * must either be empty or an enemy piece must be there. In case there is an enemy piece, the
-     * capture modifier must be set. There are no checks if the move is legal. En passant, castling
-     * and promotions are done properly but no rules are being checked if those are legal. Just that
-     * the pieces involved in the move are actually present and there end fields are free or an enemy
-     * to be captures is there.
-     *
-     * @param move  The move to execute
-     * @return bool - Was the move executed?
-     */
-    bool applyMove(Move move);
-
     enum class Castling : char { WHITE_SHORT = 0x01, WHITE_LONG = 0x02, BLACK_SHORT = 0x04, BLACK_LONG = 0x08 };
     bool canCastle(Castling castling) const;
     void setCastlingRaw(uint8_t);
@@ -168,13 +156,16 @@ class Board {
     Color whosTurnIsIt() const;
     void setTurn(Color);
 
+    void setLegality(Legality legality);
+    Legality getLegality() const;
+
     std::optional<ChessField> findFirstPiece(const std::function<bool(ChessPiece)>& predicate) const;
     int countAllPieces(const std::function<bool(ChessPiece)>& predicate) const;
 
    private:
-    bool isInBounds(ChessField field);
     std::array<std::optional<ChessPiece>, 64> _board;
     base::flag_mask<Castling> _canCastle;
     std::optional<ChessField> _enpassantTarget;
     Color _turn;
+    Legality _legality;
 };

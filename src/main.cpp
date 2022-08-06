@@ -17,15 +17,22 @@ int main(int argc, char** argv) {
 
     Board fenBoard = BoardFactory::createBoardFromFEN(fen);
 
-    fmt::print("\nFEN String {}\n", fen);
-    fmt::print("FEN Board:\n{:b}\n", fenBoard);
+    fmt::print("\nFEN String {}", fen);
+    fmt::print("\nFEN Board:\n{:b}", fenBoard);
 
-    auto validMoves = ChessRules::getAllValidMoves(fenBoard);
+    Legality legality = ChessRules::determineBoardPositionLegality(fenBoard);
 
-    fmt::print("Valid moves for {}:\n", (fenBoard.whosTurnIsIt() == Color::WHITE ? "white" : "black"));
-    for (auto validMove : validMoves) {
-        fmt::print("Move: {}\n", validMove);
+    fmt::print("\nBoard position is {}", legality == Legality::LEGAL ? "legal" : "illegal");
+
+    if (legality == Legality::LEGAL) {
+        auto validMoves = ChessRules::getAllValidMoves(fenBoard);
+
+        fmt::print("\nValid moves for {}:", (fenBoard.whosTurnIsIt() == Color::WHITE ? "white" : "black"));
+        for (auto validMove : validMoves) {
+            fmt::print("\nMove: {}", validMove);
+        }
     }
+    fmt::print("\n");
 
     return 0;
 }

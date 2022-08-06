@@ -1,1 +1,1 @@
-* k7/8/8/3P4/4p3/8/8/K7 b qQkK -    causes crash (most likely due to Castling)
+*

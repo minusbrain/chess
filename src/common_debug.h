@@ -26,6 +26,8 @@ inline char getDebugCharForPiece(ChessPiece p, bool caseBasedOnColor = true) {
         case Piece::KING:
             c = 'K';
             break;
+        case Piece::DECOY:
+            c = 'X';
     }
     if (caseBasedOnColor && std::get<ColorIdx>(p) == Color::BLACK)
         return (char)std::tolower(c);

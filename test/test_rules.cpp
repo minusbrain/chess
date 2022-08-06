@@ -179,7 +179,7 @@ TEST(TestChessRules, Castling_BlackKingPathCoveredByEnemy_ExpectNoCastlingOption
 }
 
 TEST(TestChessRules, Castling_WhiteKingEndfieldoveredByEnemy_ExpectNoCastlingOptions) {
-    Board board = BoardFactory::createBoardFromFEN("2r3r1/8/8/8/8/8/8/R3K2R w QK -");
+    Board board = BoardFactory::createBoardFromFEN("2r1k1r1/8/8/8/8/8/8/R3K2R w KQ -");
 
     auto moves = ChessRules::getAllValidMoves(board);
 
@@ -188,7 +188,7 @@ TEST(TestChessRules, Castling_WhiteKingEndfieldoveredByEnemy_ExpectNoCastlingOpt
 }
 
 TEST(TestChessRules, Castling_WhiteKingCastlingCoveredByPawns_ExpectNoCastlingOptions) {
-    Board board = BoardFactory::createBoardFromFEN("8/8/8/8/8/8/3p2p1/R3K2R w QK -");
+    Board board = BoardFactory::createBoardFromFEN("4k3/8/8/8/8/8/3p2p1/R3K2R w KQ -");
 
     auto moves = ChessRules::getAllValidMoves(board);
 
