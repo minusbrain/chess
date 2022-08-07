@@ -164,6 +164,11 @@ bool ChessRules::isMoveLegal(const Board& board, const Move& potentialMove) {
             return false;
         }
     }
+    if (potentialMove.hasModifier(MoveModifier::CAPTURE)) {
+        if (board.getField(potentialMove.getEndField()).has_value() &&
+            std::get<PieceIdx>(board.getField(potentialMove.getEndField()).value()) == Piece::KING)
+            return false;
+    }
     return !wouldMoveSelfIntoCheck(board, potentialMove);
 }
 

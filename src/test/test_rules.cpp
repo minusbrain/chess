@@ -264,3 +264,9 @@ TEST(TestChessRules, MoveAnnotation_RookCanSetStaleMate_ExpectCorrectMoveAnnotat
     EXPECT_DOESNOT_CONTAIN(Move{{Color::WHITE, Piece::ROOK}, {B, 6}, {B, 7}}, moves);
     EXPECT_CONTAINS(Move{{Color::WHITE, Piece::ROOK}, {B, 6}, {B, 7}, {MoveModifier::STALE_MATE}}, moves);
 }
+
+TEST(TestChessRules, RandomFen_CausedCoreDump_GithubIssue_1) {
+    // https://github.com/minusbrain/chess/issues/1
+    auto board = debugWrappedGetBoardFromFEN("4N3/N1N3n1/8/N5K1/7R/PR3Bk1/8/6Q1 w - -");
+    EXPECT_NO_FATAL_FAILURE(auto moves = debugWrappedGetAllValidMoves(board));
+}
