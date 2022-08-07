@@ -18,10 +18,10 @@ class ChessRules {
 
     static std::vector<Move> getPotentialMoves(const Board& board, ChessPieceOnField pieceOnField);
 
-    static bool isCastlingIllegal(const Board& board, const Move& potentialMove);
+    static bool isCastlingLegal(const Board& board, const Move& potentialMove);
     static bool isMoveLegal(const Board& board, const Move& potentialMove, IgnoreCheck ignoreCheck);
 
-    static bool isFieldCoveredByColor(const Board& board, ChessField& field, Color color);
+    static bool isFieldCoveredByColor(const Board& board, const ChessField& field, Color color);
 
     /**
      * @brief Applies the requested move. Only very rudimentary checks are applied

@@ -3,12 +3,12 @@
 
 #include <optional>
 
-#include "../src/board.h"
-#include "../src/board_debug.h"
-#include "../src/board_factory.h"
-#include "../src/move.h"
-#include "../src/move_debug.h"
-#include "../src/rules.h"
+#include "../board.h"
+#include "../board_debug.h"
+#include "../board_factory.h"
+#include "../move.h"
+#include "../move_debug.h"
+#include "../rules.h"
 
 TEST(TestChessBoard, A1ShouldBeEmptyOnAnEmptyBoard) {
     Board emptyBoard = BoardFactory::createEmptyBoard();

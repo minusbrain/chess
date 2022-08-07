@@ -33,7 +33,7 @@ bool ChessRules::isCheck(const Board& board) {
     return isFieldCoveredByColor(otherPlayerBoard, kingField, board.whosTurnIsIt());
 };
 
-bool ChessRules::isFieldCoveredByColor(const Board& board, ChessField& field, Color color) {
+bool ChessRules::isFieldCoveredByColor(const Board& board, const ChessField& field, Color color) {
     Board tempBoard(board);
     Color oppositeColor = getOppositeColor(color);
 
@@ -111,7 +111,7 @@ std::vector<Move> ChessRules::getPotentialMoves(const Board& board, ChessPieceOn
     return pieceRules[piece]->getPotentialMoves(board, pieceOnField);
 }
 
-bool ChessRules::isCastlingIllegal(const Board& board, const Move& potentialMove) {
+bool ChessRules::isCastlingLegal(const Board& board, const Move& potentialMove) {
     // Todo. Fix / Implement by using      numOfPotentialMovesCoveringField(const Board &board, ChessField field)
     Color movingColor = std::get<ColorIdx>(potentialMove.getChessPiece());
     ChessRank castlingRank = (movingColor == Color::WHITE ? 1 : 8);
@@ -119,25 +119,25 @@ bool ChessRules::isCastlingIllegal(const Board& board, const Move& potentialMove
     if (potentialMove.hasModifier(MoveModifier::CASTLING_LONG)) {
         if (board.getField({B, castlingRank}).has_value() || board.getField({C, castlingRank}).has_value() ||
             board.getField({D, castlingRank}).has_value()) {
-            return true;
+            return false;
         }
-        Move move{potentialMove.getChessPiece(), potentialMove.getStartField(), {D, castlingRank}};
-        return wouldBeCheck(board, move);
+        return !isFieldCoveredByColor(board, ChessField{D, castlingRank}, getOppositeColor(movingColor));
 
     } else if (potentialMove.hasModifier(MoveModifier::CASTLING_SHORT)) {
         if (board.getField({F, castlingRank}).has_value() || board.getField({G, castlingRank}).has_value()) {
-            return true;
+            return false;
         }
-        Move move{potentialMove.getChessPiece(), potentialMove.getStartField(), {F, castlingRank}};
-        return wouldBeCheck(board, move);
+        return !isFieldCoveredByColor(board, ChessField{F, castlingRank}, getOppositeColor(movingColor));
     }
 
-    return false;
+    // If the final position of the king is covered is checked on higher level, so we do not check it here again.
+
+    return true;
 }
 
 bool ChessRules::isMoveLegal(const Board& board, const Move& potentialMove, IgnoreCheck ignoreCheck) {
     if (potentialMove.hasModifier(MoveModifier::CASTLING_LONG) || potentialMove.hasModifier(MoveModifier::CASTLING_SHORT)) {
-        if (isCastlingIllegal(board, potentialMove)) {
+        if (!isCastlingLegal(board, potentialMove)) {
             return false;
         }
     }
