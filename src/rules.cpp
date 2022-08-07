@@ -3,6 +3,7 @@
 #include <base/improve_containers.h>
 
 #include <cassert>
+#include <iostream>
 
 #include "board.h"
 #include "board_debug.h"
@@ -30,9 +31,9 @@ bool ChessRules::isCheck(const Board& board) {
     return isFieldCoveredByColor(board, kingField, getOppositeColor(board.whosTurnIsIt()));
 };
 
-bool ChessRules::isCheckMate(const Board& board) {
-    if (isCheck(board)) {
-        auto moves = getAllValidMoves(board);
+bool ChessRules::isCheckMate(const Board& board, bool checkHint) {
+    if (checkHint || isCheck(board)) {
+        auto moves = getAllValidMoves(board, false);
         if (moves.size() == 0) {
             return true;
         }
@@ -40,9 +41,9 @@ bool ChessRules::isCheckMate(const Board& board) {
     return false;
 };
 
-bool ChessRules::isStaleMate(const Board& board) {
-    if (!isCheck(board)) {
-        auto moves = getAllValidMoves(board);
+bool ChessRules::isStaleMate(const Board& board, bool checkHint) {
+    if (!checkHint || !isCheck(board)) {
+        auto moves = getAllValidMoves(board, false);
         if (moves.size() == 0) {
             return true;
         }
@@ -77,16 +78,37 @@ bool ChessRules::wouldMoveSelfIntoCheck(const Board& board, const Move& move) {
     return isFieldCoveredByColor(postMoveBoard, kingField, postMoveBoard.whosTurnIsIt());
 };
 
-std::vector<Move> ChessRules::getAllValidMoves(const Board& board, IgnoreCheck ignoreCheck) {
+std::vector<Move> ChessRules::getAllValidMoves(const Board& board, bool annotate) {
     std::vector<Move> validMoves;
 
     auto potentialMoves = getAllPotentialMoves(board);
 
     for (auto potentialMove : potentialMoves) {
-        if (ChessRules::isMoveLegal(board, potentialMove, ignoreCheck)) validMoves.push_back(potentialMove);
+        if (ChessRules::isMoveLegal(board, potentialMove)) validMoves.push_back(potentialMove);
     }
+    if (annotate) annotateMoves(board, validMoves);
 
     return validMoves;
+}
+
+void ChessRules::annotateMoves(const Board& board, std::vector<Move>& moves) {
+    for (auto& move : moves) {
+        // std::cout << "\nApplying " << move << " to " << board << std::flush;
+        Board resultingBoard(board);
+        assert(guardedApplyMove(resultingBoard, move));
+        bool check = isCheck(resultingBoard);
+
+        if (isCheckMate(resultingBoard, check)) {
+            // std::cout << "\nMove " << move << " is check mate!" << std::flush;
+            move.addModifier(MoveModifier::CHECK_MATE);
+        } else if (isStaleMate(resultingBoard, check)) {
+            // std::cout << "\nMove " << move << " is stale mate!" << std::flush;
+            move.addModifier(MoveModifier::STALE_MATE);
+        } else if (check) {
+            // std::cout << "\nMove " << move << " is check!" << std::flush;
+            move.addModifier(MoveModifier::CHECK);
+        }
+    }
 }
 
 std::vector<Move> ChessRules::getAllPotentialMoves(const Board& board) {
@@ -136,13 +158,13 @@ bool ChessRules::isCastlingLegal(const Board& board, const Move& potentialMove) 
 
 // Expects that the provided move follows the basic movement rules. This just checks if
 // castling is legal and if the move would create a check for the other side.
-bool ChessRules::isMoveLegal(const Board& board, const Move& potentialMove, IgnoreCheck ignoreCheck) {
+bool ChessRules::isMoveLegal(const Board& board, const Move& potentialMove) {
     if (potentialMove.hasModifier(MoveModifier::CASTLING_LONG) || potentialMove.hasModifier(MoveModifier::CASTLING_SHORT)) {
         if (!isCastlingLegal(board, potentialMove)) {
             return false;
         }
     }
-    return ignoreCheck == IgnoreCheck::YES || !wouldMoveSelfIntoCheck(board, potentialMove);
+    return !wouldMoveSelfIntoCheck(board, potentialMove);
 }
 
 bool ChessRules::guardedApplyMove(Board& board, const Move& move) {
@@ -279,7 +301,7 @@ bool ChessRules::applyMove(Board& board, const Move& move) {
 
     board.clearField(sf);
     board.setField(ef, cp);
-    board.setTurn(movingColor == Color::WHITE ? Color::BLACK : Color::WHITE);
+    board.setTurn(getOppositeColor(movingColor));
 
     return true;
 }

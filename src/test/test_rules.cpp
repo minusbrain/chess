@@ -73,7 +73,7 @@ TEST(TestChessRules, PawnPositions_PawnCanCapture_FindAllPossibleBlackMoves) {
 }
 
 TEST(TestChessRules, PawnPositions_PawnCanPromote_FindAllPossibleWhiteMoves) {
-    auto board = debugWrappedGetBoardFromFEN("k7/3P4/8/8/8/8/3p4/K7 w - -");
+    auto board = debugWrappedGetBoardFromFEN("8/k2P4/8/8/8/8/K2p4/8 w - -");
     auto moves = debugWrappedGetAllValidMoves(board);
 
     EXPECT_CONTAINS(Move{{Color::WHITE, Piece::PAWN}, {D, 7}, {D, 8}, {MoveModifier::PROMOTE_BISHOP}}, moves);
@@ -84,7 +84,7 @@ TEST(TestChessRules, PawnPositions_PawnCanPromote_FindAllPossibleWhiteMoves) {
 }
 
 TEST(TestChessRules, PawnPositions_PawnCanPromote_FindAllPossibleBlackMoves) {
-    auto board = debugWrappedGetBoardFromFEN("k7/3P4/8/8/8/8/3p4/K7 b - -");
+    auto board = debugWrappedGetBoardFromFEN("8/k2P4/8/8/8/8/K2p4/8 b - -");
     auto moves = debugWrappedGetAllValidMoves(board);
 
     EXPECT_CONTAINS(Move{{Color::BLACK, Piece::PAWN}, {D, 2}, {D, 1}, {MoveModifier::PROMOTE_BISHOP}}, moves);
@@ -95,7 +95,7 @@ TEST(TestChessRules, PawnPositions_PawnCanPromote_FindAllPossibleBlackMoves) {
 }
 
 TEST(TestChessRules, PawnPositions_PawnCanPromoteByCapture_FindAllPossibleWhiteMoves) {
-    auto board = debugWrappedGetBoardFromFEN("k1rB4/3P4/8/8/8/8/3p4/K1Rb4 w - -");
+    auto board = debugWrappedGetBoardFromFEN("2rB3k/3P4/8/8/8/8/3p4/2Rb3K w - -");
     auto moves = debugWrappedGetAllValidMoves(board);
 
     EXPECT_CONTAINS(Move{{Color::WHITE, Piece::PAWN}, {D, 7}, {C, 8}, {MoveModifier::PROMOTE_BISHOP, MoveModifier::CAPTURE}}, moves);
@@ -106,7 +106,7 @@ TEST(TestChessRules, PawnPositions_PawnCanPromoteByCapture_FindAllPossibleWhiteM
 }
 
 TEST(TestChessRules, PawnPositions_PawnCanPromoteByCapture_FindAllPossibleBlackMoves) {
-    auto board = debugWrappedGetBoardFromFEN("k1rB4/3P4/8/8/8/8/3p4/K1Rb4 b - -");
+    auto board = debugWrappedGetBoardFromFEN("2rB3k/3P4/8/8/8/8/3p4/2Rb3K b - -");
     auto moves = debugWrappedGetAllValidMoves(board);
 
     EXPECT_CONTAINS(Move{{Color::BLACK, Piece::PAWN}, {D, 2}, {C, 1}, {MoveModifier::PROMOTE_BISHOP, MoveModifier::CAPTURE}}, moves);
@@ -236,4 +236,31 @@ TEST(TestChessRules, Check_CheckButCoverMovePreventsMate_CorrectStates) {
     EXPECT_TRUE(ChessRules::isCheck(board));
     EXPECT_FALSE(ChessRules::isCheckMate(board));
     EXPECT_FALSE(ChessRules::isStaleMate(board));
+}
+
+TEST(TestChessRules, MoveAnnotation_RookCanSetCheck_ExpectCorrectMoveAnnotations) {
+    auto board = debugWrappedGetBoardFromFEN("4k3/8/8/8/8/8/8/R6K w - -");
+    auto moves = debugWrappedGetAllValidMoves(board);
+
+    EXPECT_DOESNOT_CONTAIN(Move{{Color::WHITE, Piece::ROOK}, {A, 1}, {A, 8}}, moves);
+    EXPECT_CONTAINS(Move{{Color::WHITE, Piece::ROOK}, {A, 1}, {A, 8}, {MoveModifier::CHECK}}, moves);
+    EXPECT_DOESNOT_CONTAIN(Move{{Color::WHITE, Piece::ROOK}, {A, 1}, {E, 1}}, moves);
+    EXPECT_CONTAINS(Move{{Color::WHITE, Piece::ROOK}, {A, 1}, {E, 1}, {MoveModifier::CHECK}}, moves);
+}
+
+TEST(TestChessRules, MoveAnnotation_RookCanSetCheckMate_ExpectCorrectMoveAnnotations) {
+    auto board = debugWrappedGetBoardFromFEN("4k3/1R6/8/8/8/8/8/R6K w - -");
+    auto moves = debugWrappedGetAllValidMoves(board);
+
+    EXPECT_DOESNOT_CONTAIN(Move{{Color::WHITE, Piece::ROOK}, {A, 1}, {A, 8}}, moves);
+    EXPECT_DOESNOT_CONTAIN(Move{{Color::WHITE, Piece::ROOK}, {A, 1}, {A, 8}, {MoveModifier::CHECK}}, moves);
+    EXPECT_CONTAINS(Move{{Color::WHITE, Piece::ROOK}, {A, 1}, {A, 8}, {MoveModifier::CHECK_MATE}}, moves);
+}
+
+TEST(TestChessRules, MoveAnnotation_RookCanSetStaleMate_ExpectCorrectMoveAnnotations) {
+    auto board = debugWrappedGetBoardFromFEN("k7/8/1R6/8/8/8/8/1R5K w - -");
+    auto moves = debugWrappedGetAllValidMoves(board);
+
+    EXPECT_DOESNOT_CONTAIN(Move{{Color::WHITE, Piece::ROOK}, {B, 6}, {B, 7}}, moves);
+    EXPECT_CONTAINS(Move{{Color::WHITE, Piece::ROOK}, {B, 6}, {B, 7}, {MoveModifier::STALE_MATE}}, moves);
 }

@@ -9,15 +9,16 @@ class Move;
 class ChessRules {
    public:
     static std::vector<Move> getAllPotentialMoves(const Board& board);
-    static std::vector<Move> getAllValidMoves(const Board& board, IgnoreCheck ignoreCheck = IgnoreCheck::NO);
+    static std::vector<Move> getAllValidMoves(const Board& board, bool annotate = true);
+    static void annotateMoves(const Board& board, std::vector<Move>& moves);
 
     static bool isCheck(const Board& board);
-    static bool isCheckMate(const Board& board);
-    static bool isStaleMate(const Board& board);
+    static bool isCheckMate(const Board& board, bool checkHint = false);
+    static bool isStaleMate(const Board& board, bool checkHint = true);
 
     static std::vector<Move> getPotentialMoves(const Board& board, ChessPieceOnField pieceOnField);
     static bool isCastlingLegal(const Board& board, const Move& potentialMove);
-    static bool isMoveLegal(const Board& board, const Move& potentialMove, IgnoreCheck ignoreCheck);
+    static bool isMoveLegal(const Board& board, const Move& potentialMove);
 
     static bool wouldMoveSelfIntoCheck(const Board& board, const Move& move);
     static bool isFieldCoveredByColor(const Board& board, const ChessField& field, Color color);

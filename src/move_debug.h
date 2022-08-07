@@ -73,6 +73,8 @@ inline std::string optionalMoveSuffixes(Move move) {
         ret.append("+");
     else if (move.hasModifier(MoveModifier::CHECK_MATE))
         ret.append("#");
+    else if (move.hasModifier(MoveModifier::STALE_MATE))
+        ret.append(" stalemate");
 
     if (move.hasModifier(MoveModifier::EN_PASSANT)) ret.append(" e.p.");
 

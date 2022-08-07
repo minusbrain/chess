@@ -13,8 +13,6 @@ enum class Piece { PAWN, ROOK, KNIGHT, BISHOP, QUEEN, KING, DECOY };
 
 enum class Legality { UNDETERMINED, LEGAL, ILLEGAL };
 
-enum class IgnoreCheck { YES, NO };
-
 /**
  * @brief A chess-piece with color and type
  */

@@ -7,6 +7,7 @@
 enum class MoveModifier {
     CHECK,
     CHECK_MATE,
+    STALE_MATE,
     CAPTURE,
     EN_PASSANT,
     CASTLING_SHORT,
@@ -20,8 +21,7 @@ enum class MoveModifier {
 class Move {
    public:
     Move(ChessPiece piece, ChessField start, ChessField end, std::set<MoveModifier> mods = {});
-    Move(ChessPiece piece, ChessFile startLine, ChessRank startRow, ChessFile endLine, ChessRank endRow,
-         std::set<MoveModifier> mods = {});
+    Move(ChessPiece piece, ChessFile startLine, ChessRank startRow, ChessFile endLine, ChessRank endRow, std::set<MoveModifier> mods = {});
 
     bool operator==(const Move& other) const = default;
 
