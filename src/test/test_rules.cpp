@@ -125,6 +125,55 @@ TEST(TestChessRules, PawnPositions_PawnCanCaptureEnPassant_FindAllPossibleWhiteM
     EXPECT_EQ(2, getNumberOfMovesForPiece(moves, {Color::BLACK, Piece::PAWN}));
 }
 
+TEST(TestChessRules, KingPositions_CornerPosition_FindAllPossibleMoves) {
+    auto board = debugWrappedGetBoardFromFEN("k7/8/8/8/8/8/8/K7 w - -");
+    auto moves = debugWrappedGetAllValidMoves(board);
+
+    EXPECT_CONTAINS(Move{{Color::WHITE, Piece::KING}, {A, 1}, {A, 2}}, moves);
+    EXPECT_CONTAINS(Move{{Color::WHITE, Piece::KING}, {A, 1}, {B, 1}}, moves);
+    EXPECT_CONTAINS(Move{{Color::WHITE, Piece::KING}, {A, 1}, {B, 2}}, moves);
+    EXPECT_EQ(3, getNumberOfMovesForPiece(moves, {Color::WHITE, Piece::KING}));
+}
+
+TEST(TestChessRules, KingPositions_SidePosition_FindAllPossibleMoves) {
+    auto board = debugWrappedGetBoardFromFEN("k7/8/8/8/8/8/8/4K3 w - -");
+    auto moves = debugWrappedGetAllValidMoves(board);
+
+    EXPECT_CONTAINS(Move{{Color::WHITE, Piece::KING}, {E, 1}, {D, 1}}, moves);
+    EXPECT_CONTAINS(Move{{Color::WHITE, Piece::KING}, {E, 1}, {D, 2}}, moves);
+    EXPECT_CONTAINS(Move{{Color::WHITE, Piece::KING}, {E, 1}, {E, 2}}, moves);
+    EXPECT_CONTAINS(Move{{Color::WHITE, Piece::KING}, {E, 1}, {F, 1}}, moves);
+    EXPECT_CONTAINS(Move{{Color::WHITE, Piece::KING}, {E, 1}, {F, 2}}, moves);
+    EXPECT_EQ(5, getNumberOfMovesForPiece(moves, {Color::WHITE, Piece::KING}));
+}
+
+TEST(TestChessRules, KingPositions_CenterPosition_FindAllPossibleMoves) {
+    auto board = debugWrappedGetBoardFromFEN("k7/8/8/8/8/4K3/8/8 w - -");
+    auto moves = debugWrappedGetAllValidMoves(board);
+
+    EXPECT_CONTAINS(Move{{Color::WHITE, Piece::KING}, {E, 3}, {D, 2}}, moves);
+    EXPECT_CONTAINS(Move{{Color::WHITE, Piece::KING}, {E, 3}, {D, 3}}, moves);
+    EXPECT_CONTAINS(Move{{Color::WHITE, Piece::KING}, {E, 3}, {D, 4}}, moves);
+    EXPECT_CONTAINS(Move{{Color::WHITE, Piece::KING}, {E, 3}, {E, 2}}, moves);
+    EXPECT_CONTAINS(Move{{Color::WHITE, Piece::KING}, {E, 3}, {E, 4}}, moves);
+    EXPECT_CONTAINS(Move{{Color::WHITE, Piece::KING}, {E, 3}, {F, 2}}, moves);
+    EXPECT_CONTAINS(Move{{Color::WHITE, Piece::KING}, {E, 3}, {F, 3}}, moves);
+    EXPECT_CONTAINS(Move{{Color::WHITE, Piece::KING}, {E, 3}, {F, 4}}, moves);
+    EXPECT_EQ(8, getNumberOfMovesForPiece(moves, {Color::WHITE, Piece::KING}));
+}
+
+TEST(TestChessRules, KingPositions_CenterPositionButBlockedByOpponent_FindAllPossibleMoves) {
+    auto board = debugWrappedGetBoardFromFEN("8/8/8/4k3/8/4K3/8/8 w - -");
+    auto moves = debugWrappedGetAllValidMoves(board);
+
+    EXPECT_CONTAINS(Move{{Color::WHITE, Piece::KING}, {E, 3}, {D, 2}}, moves);
+    EXPECT_CONTAINS(Move{{Color::WHITE, Piece::KING}, {E, 3}, {D, 3}}, moves);
+    EXPECT_CONTAINS(Move{{Color::WHITE, Piece::KING}, {E, 3}, {E, 2}}, moves);
+    EXPECT_CONTAINS(Move{{Color::WHITE, Piece::KING}, {E, 3}, {F, 2}}, moves);
+    EXPECT_CONTAINS(Move{{Color::WHITE, Piece::KING}, {E, 3}, {F, 3}}, moves);
+    EXPECT_EQ(5, getNumberOfMovesForPiece(moves, {Color::WHITE, Piece::KING}));
+}
+
 TEST(TestChessRules, Castling_WhiteKingPathCoveredByEnemy_ExpectNoCastlingOptions) {
     auto board = debugWrappedGetBoardFromFEN("1k1r1r2/8/8/8/8/8/8/R3K2R w QK -");
     auto moves = debugWrappedGetAllValidMoves(board);
