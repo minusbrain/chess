@@ -69,14 +69,14 @@ struct fmt::formatter<Board> {
     }
 
     template <typename FormatContext>
-    auto format(const Board &b, FormatContext &ctx) {
+    auto format(const Board &board, FormatContext &ctx) {
         auto it = ctx.out();
         if (!big) {
             it = format_to(it, "\n abcdefgh\n");
             for (int row = 8; row > 0; --row) {
                 it = format_to(it, "{}", row);
                 for (int line = A; line <= H; ++line) {
-                    auto cp = b.getField(line, row);
+                    auto cp = board.getField(line, row);
                     it = (cp.has_value() ? format_to(it, "{}", cp.value()) : format_to(it, " "));
                 }
                 it = format_to(it, "{}\n", row);
@@ -89,7 +89,7 @@ struct fmt::formatter<Board> {
                 it = format_to(it, "  |     |     |     |     |     |     |     |     |\n");
                 it = format_to(it, "{} ", row);
                 for (int line = 1; line <= H; ++line) {
-                    auto cp = b.getField(line, row);
+                    auto cp = board.getField(line, row);
                     it = (cp.has_value() ? format_to(it, "|  {}  ", cp.value()) : format_to(it, "|     "));
                 }
                 it = format_to(it, "| {}\n  |     |     |     |     |     |     |     |     |\n", row);
@@ -101,3 +101,25 @@ struct fmt::formatter<Board> {
         return it;
     }
 };
+
+inline std::ostream &operator<<(std::ostream &os, const ChessPiece p) {
+    os << getDebugCharForPiece(p);
+    return os;
+}
+
+inline std::ostream &operator<<(std::ostream &os, const Board &board) {
+    os << "\n abcdefgh\n";
+    for (int row = 8; row > 0; --row) {
+        os << row;
+        for (int line = A; line <= H; ++line) {
+            auto cp = board.getField(line, row);
+            if (cp.has_value())
+                os << cp.value();
+            else
+                os << " ";
+        }
+        os << row << "\n";
+    }
+    os << " abcdefgh\n";
+    return os;
+}
