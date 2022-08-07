@@ -6,7 +6,7 @@
 #include "types.h"
 
 inline char getDebugCharForPiece(ChessPiece p, bool caseBasedOnColor = true) {
-    char c;
+    char c = ' ';
     switch (std::get<PieceIdx>(p)) {
         case Piece::PAWN:
             c = 'P';
