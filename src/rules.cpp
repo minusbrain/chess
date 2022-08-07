@@ -27,10 +27,27 @@ bool ChessRules::isCheck(const Board& board) {
     assert(kingFieldOpt.has_value());
     ChessField kingField = kingFieldOpt.value();
 
-    Board otherPlayerBoard(board);
-    otherPlayerBoard.setTurn(getOppositeColor(board.whosTurnIsIt()));
+    return isFieldCoveredByColor(board, kingField, getOppositeColor(board.whosTurnIsIt()));
+};
 
-    return isFieldCoveredByColor(otherPlayerBoard, kingField, board.whosTurnIsIt());
+bool ChessRules::isCheckMate(const Board& board) {
+    if (isCheck(board)) {
+        auto moves = getAllValidMoves(board);
+        if (moves.size() == 0) {
+            return true;
+        }
+    }
+    return false;
+};
+
+bool ChessRules::isStaleMate(const Board& board) {
+    if (!isCheck(board)) {
+        auto moves = getAllValidMoves(board);
+        if (moves.size() == 0) {
+            return true;
+        }
+    }
+    return false;
 };
 
 bool ChessRules::isFieldCoveredByColor(const Board& board, const ChessField& field, Color color) {
@@ -46,17 +63,7 @@ bool ChessRules::isFieldCoveredByColor(const Board& board, const ChessField& fie
     return (numOfCaptureMoves > 0);
 }
 
-bool ChessRules::isCheckMate(const Board& board) {
-    // Todo Properly implement. We need some kind of caching for Board -> Moves -> Resulting boards
-    if (!isCheck(board)) {
-        return false;
-    }
-
-    return false;
-};
-
-bool ChessRules::wouldBeCheck(const Board& board, const Move& move) {
-    // fmt::print("WouldBeCheck move {} to board \n{}", move, board);
+bool ChessRules::wouldMoveSelfIntoCheck(const Board& board, const Move& move) {
     Color color = board.whosTurnIsIt();
 
     Board postMoveBoard(board);
@@ -68,14 +75,6 @@ bool ChessRules::wouldBeCheck(const Board& board, const Move& move) {
     ChessField kingField = kingFieldOpt.value();
 
     return isFieldCoveredByColor(postMoveBoard, kingField, postMoveBoard.whosTurnIsIt());
-};
-
-bool ChessRules::wouldBeCheckMate(const Board& board, const Move& move) {
-    // Todo Properly implement. We need some kind of caching for Board -> Moves -> Resulting boards
-    if (!wouldBeCheck(board, move)) {
-        return false;
-    }
-    return false;
 };
 
 std::vector<Move> ChessRules::getAllValidMoves(const Board& board, IgnoreCheck ignoreCheck) {
@@ -135,13 +134,15 @@ bool ChessRules::isCastlingLegal(const Board& board, const Move& potentialMove) 
     return true;
 }
 
+// Expects that the provided move follows the basic movement rules. This just checks if
+// castling is legal and if the move would create a check for the other side.
 bool ChessRules::isMoveLegal(const Board& board, const Move& potentialMove, IgnoreCheck ignoreCheck) {
     if (potentialMove.hasModifier(MoveModifier::CASTLING_LONG) || potentialMove.hasModifier(MoveModifier::CASTLING_SHORT)) {
         if (!isCastlingLegal(board, potentialMove)) {
             return false;
         }
     }
-    return ignoreCheck == IgnoreCheck::YES || !wouldBeCheck(board, potentialMove);
+    return ignoreCheck == IgnoreCheck::YES || !wouldMoveSelfIntoCheck(board, potentialMove);
 }
 
 bool ChessRules::guardedApplyMove(Board& board, const Move& move) {

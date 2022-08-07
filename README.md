@@ -13,7 +13,7 @@ The project crates two binaries:
 Currently this only takes a [FEN String](https://www.chess.com/terms/fen-chess#en-passant-targets) as the only input
 and prints the board in ASCII style and shows the valid moves for the color whos turn it is currently.
 
-Try it: 
+Try it:
 ```bash
 ./run_chess "k1p5/8/P1r1p3/8/8/2P1R2p/8/K3P3 b - -"
 ```
@@ -60,7 +60,6 @@ This is work in progress
 * Play a chess game (neither for humans or CPUs)
 * Support any kind of GUI
 * Manipulate a board via command line
-* Detect check-mate
 * Annotate moves with check, check-mate or stale-mate
 * Implement board -> possible moves -> check/check-mate/stale-mate information caching
 * Be properly tested  ;-)

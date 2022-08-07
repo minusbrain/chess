@@ -205,3 +205,35 @@ TEST(TestChessRules, Castling_WhiteKingCastlingCoveredByPawns_ExpectNoCastlingOp
     EXPECT_DOESNOT_CONTAIN(Move{{Color::WHITE, Piece::KING}, {E, 1}, {G, 1}, {MoveModifier::CASTLING_SHORT}}, moves);
     EXPECT_DOESNOT_CONTAIN(Move{{Color::WHITE, Piece::KING}, {E, 1}, {C, 1}, {MoveModifier::CASTLING_LONG}}, moves);
 }
+
+TEST(TestChessRules, Check_SimpleCheck_CorrectStates) {
+    auto board = debugWrappedGetBoardFromFEN("4k3/8/8/8/8/8/8/r3K3 w - -");
+
+    EXPECT_TRUE(ChessRules::isCheck(board));
+    EXPECT_FALSE(ChessRules::isCheckMate(board));
+    EXPECT_FALSE(ChessRules::isStaleMate(board));
+}
+
+TEST(TestChessRules, Check_SimpleCheckMate_CorrectStates) {
+    auto board = debugWrappedGetBoardFromFEN("4k3/8/8/8/8/8/r7/r3K3 w - -");
+
+    EXPECT_TRUE(ChessRules::isCheck(board));
+    EXPECT_TRUE(ChessRules::isCheckMate(board));
+    EXPECT_FALSE(ChessRules::isStaleMate(board));
+}
+
+TEST(TestChessRules, Check_SimpleStaleMate_CorrectStates) {
+    auto board = debugWrappedGetBoardFromFEN("4k1r1/8/8/8/8/8/r7/7K w - -");
+
+    EXPECT_FALSE(ChessRules::isCheck(board));
+    EXPECT_FALSE(ChessRules::isCheckMate(board));
+    EXPECT_TRUE(ChessRules::isStaleMate(board));
+}
+
+TEST(TestChessRules, Check_CheckButCoverMovePreventsMate_CorrectStates) {
+    auto board = debugWrappedGetBoardFromFEN("4k3/8/8/8/8/1R6/r7/r6K w - -");
+
+    EXPECT_TRUE(ChessRules::isCheck(board));
+    EXPECT_FALSE(ChessRules::isCheckMate(board));
+    EXPECT_FALSE(ChessRules::isStaleMate(board));
+}
