@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import random
+import sys
 
 piece_list = ["R", "N", "B", "Q", "P"]
 
@@ -57,8 +58,8 @@ def pawn_on_promotion_square(pc, pr):
     return False
 
 
-def start():
-    for i in range(1000):
+def start(num):
+    for i in range(num):
         board = [[" " for x in range(8)] for y in range(8)]
         piece_amount_white, piece_amount_black = random.randint(0, 15), random.randint(0, 15)
         place_kings(board)
@@ -67,4 +68,4 @@ def start():
 
 
 # entry point
-start()
+start(int(sys.argv[1]))
