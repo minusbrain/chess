@@ -10,12 +10,12 @@ The project crates two binaries:
 * libchess library -> The engine
 * run_chess executable -> A simple executable that uses the library. See below for details of its function.
 
-Currently this only takes a [FEN String](https://www.chess.com/terms/fen-chess#en-passant-targets) as the only input
+Currently this only takes [FEN Strings](https://www.chess.com/terms/fen-chess#en-passant-targets) via stdin
 and prints the board in ASCII style and shows the valid moves for the color whos turn it is currently.
 
 Try it:
 ```bash
-./run_chess "k1p5/8/P1r1p3/8/8/2P1R2p/8/K3P3 b - -"
+echo "k1p5/8/P1r1p3/8/8/2P1R2p/8/K3P3 b - -" | ./run_chess
 ```
 
 You can use a FEN String generator like [this](http://www.netreal.de/Forsyth-Edwards-Notation/index.php) to
