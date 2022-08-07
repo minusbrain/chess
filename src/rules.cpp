@@ -59,15 +59,15 @@ bool ChessRules::wouldBeCheck(const Board& board, const Move& move) {
     // fmt::print("WouldBeCheck move {} to board \n{}", move, board);
     Color color = board.whosTurnIsIt();
 
-    Board otherPlayerBoard(board);
-    applyMove(otherPlayerBoard, move);
-    std::optional<ChessField> kingFieldOpt = otherPlayerBoard.findFirstPiece([color](ChessPiece cp) {
+    Board postMoveBoard(board);
+    applyMove(postMoveBoard, move);
+    std::optional<ChessField> kingFieldOpt = postMoveBoard.findFirstPiece([color](ChessPiece cp) {
         return cp == ChessPiece{color, Piece::KING};
     });
     assert(kingFieldOpt.has_value());
     ChessField kingField = kingFieldOpt.value();
 
-    return isFieldCoveredByColor(otherPlayerBoard, kingField, otherPlayerBoard.whosTurnIsIt());
+    return isFieldCoveredByColor(postMoveBoard, kingField, postMoveBoard.whosTurnIsIt());
 };
 
 bool ChessRules::wouldBeCheckMate(const Board& board, const Move& move) {
@@ -144,9 +144,15 @@ bool ChessRules::isMoveLegal(const Board& board, const Move& potentialMove, Igno
     return ignoreCheck == IgnoreCheck::YES || !wouldBeCheck(board, potentialMove);
 }
 
-// Todo applyMove in rules. set / unset EnPassant ...
-bool ChessRules::applyMove(Board& board, const Move& move) {
+bool ChessRules::guardedApplyMove(Board& board, const Move& move) {
     assert(determineBoardPositionLegality(board) == Legality::LEGAL);
+    bool ret = applyMove(board, move);
+
+    if (ret) assert(determineBoardPositionLegality(board) == Legality::LEGAL);
+    return ret;
+}
+
+bool ChessRules::applyMove(Board& board, const Move& move) {
     auto cp = move.getChessPiece();
     Color movingColor = std::get<ColorIdx>(cp);
     auto sf = move.getStartField();
@@ -273,7 +279,7 @@ bool ChessRules::applyMove(Board& board, const Move& move) {
     board.clearField(sf);
     board.setField(ef, cp);
     board.setTurn(movingColor == Color::WHITE ? Color::BLACK : Color::WHITE);
-    assert(determineBoardPositionLegality(board) == Legality::LEGAL);
+
     return true;
 }
 

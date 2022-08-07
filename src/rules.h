@@ -23,6 +23,11 @@ class ChessRules {
 
     static bool isFieldCoveredByColor(const Board& board, const ChessField& field, Color color);
 
+    static bool guardedApplyMove(Board& board, const Move& move);
+
+    static Legality determineBoardPositionLegality(Board& board);
+
+   private:
     /**
      * @brief Applies the requested move. Only very rudimentary checks are applied
      *
@@ -32,13 +37,11 @@ class ChessRules {
      * capture modifier must be set. There are no checks if the move is legal. En passant, castling
      * and promotions are done properly but no rules are being checked if those are legal. Just that
      * the pieces involved in the move are actually present and there end fields are free or an enemy
-     * to be captures is there.
+     * to be captures is there. Does no legality checks
      *
      * @param board  The board to apply the move to
      * @param move  The move to execute
      * @return bool - Was the move executed?
      */
     static bool applyMove(Board& board, const Move& move);
-
-    static Legality determineBoardPositionLegality(Board& board);
 };
