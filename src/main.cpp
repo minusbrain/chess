@@ -1,38 +1,31 @@
+#include <base/improve_containers.h>
+
+#include <iostream>
+
 #include "board.h"
 #include "board_debug.h"
 #include "board_factory.h"
-#include "fmt/core.h"
 #include "move.h"
 #include "move_debug.h"
 #include "rules.h"
 #include "types.h"
 
-int main(int argc, char** argv) {
+int main(int, char**) {
     std::string fen;
-    if (argc > 1) {
-        fen.assign(argv[1]);
-    } else {
-        fen = "8/5k2/3p4/1p1Pp2p/pP2Pp1P/P4P1K/8/8 b - - 99 50";
-    }
 
-    Board fenBoard = BoardFactory::createBoardFromFEN(fen);
+    while (std::getline(std::cin, fen)) {
+        Board fenBoard = BoardFactory::createBoardFromFEN(fen);
+        std::cout << "FEN String " << fen << fenBoard;
 
-    fmt::print("\nFEN String {}", fen);
-    fmt::print("\nFEN Board:\n{:b}", fenBoard);
+        Legality legality = ChessRules::determineBoardPositionLegality(fenBoard);
+        std::cout << "Board position is " << (legality == Legality::LEGAL ? "legal" : "illegal") << "\n";
 
-    Legality legality = ChessRules::determineBoardPositionLegality(fenBoard);
+        if (legality == Legality::LEGAL) {
+            auto validMoves = ChessRules::getAllValidMoves(fenBoard);
 
-    fmt::print("\nBoard position is {}", legality == Legality::LEGAL ? "legal" : "illegal");
-
-    if (legality == Legality::LEGAL) {
-        auto validMoves = ChessRules::getAllValidMoves(fenBoard);
-
-        fmt::print("\nValid moves for {}:", (fenBoard.whosTurnIsIt() == Color::WHITE ? "white" : "black"));
-        for (auto validMove : validMoves) {
-            fmt::print("\nMove: {}", validMove);
+            std::cout << "Valid moves for " << (fenBoard.whosTurnIsIt() == Color::WHITE ? "white" : "black") << ": " << validMoves << "\n";
         }
     }
-    fmt::print("\n");
 
     return 0;
 }
