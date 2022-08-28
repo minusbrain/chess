@@ -18,5 +18,5 @@ if(DOXYGEN_FOUND)
 					COMMENT "Generating Doxygen documentation"
 					VERBATIM)
 	# Create CMake Target for generating doc.
-	add_custom_target(docs ALL DEPENDS ${DOXYGEN_INDEX_FILE})
+	add_custom_target(docs DEPENDS ${DOXYGEN_INDEX_FILE})
 ENDIF()
