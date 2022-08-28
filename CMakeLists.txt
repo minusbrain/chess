@@ -23,4 +23,4 @@ add_subdirectory(docs)
 
 add_custom_target(chess_meta DEPENDS chess run_chess test_chess)
 
-install(TARGETS chess DESTINATION bin)
+install(TARGETS chess DESTINATION lib)
