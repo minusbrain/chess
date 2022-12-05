@@ -6,12 +6,20 @@
 #include <cassert>
 #include <cstdlib>
 #include <optional>
+#include <string>
 
 #include "common_debug.h"
 #include "move.h"
 #include "types.h"
 
-Board::Board() : _board(), _canCastle(0x00), _enpassantTarget(), _turn(Color::WHITE), _legality(Legality::UNDETERMINED) {}
+Board::Board()
+    : _board(),
+      _canCastle(0x00),
+      _enpassantTarget(),
+      _whosTurn(Color::WHITE),
+      _halfmoveClock(0),
+      _fullMoves(0),
+      _legality(Legality::UNDETERMINED) {}
 
 std::string getStringFromChessField(const ChessField& cf) {
     std::stringstream ss;
@@ -66,7 +74,13 @@ ChessField getChessFieldFromString(std::string str) {
 }
 
 Board::Board(const std::string& fen)
-    : _board(), _canCastle(0x00), _enpassantTarget(), _turn(Color::WHITE), _legality(Legality::UNDETERMINED) {
+    : _board(),
+      _canCastle(0x00),
+      _enpassantTarget(),
+      _whosTurn(Color::WHITE),
+      _halfmoveClock(0),
+      _fullMoves(0),
+      _legality(Legality::UNDETERMINED) {
     std::vector<std::string> fields = base::split(fen, ' ', 6);
     std::vector<std::string> ranks = base::split(fields[0], '/', 8);
 
@@ -100,9 +114,14 @@ Board::Board(const std::string& fen)
             setEnPassantTarget(getChessFieldFromString(fields[3]));
         }
     }
+
+    if (fields.size() > 5) {
+        _halfmoveClock = std::stoi(fields[4]);
+        _fullMoves = std::stoi(fields[5]);
+    }
 }
 
-std::string Board::getFENString() const {
+std::string Board::getFENString(bool includeMoveCount) const {
     std::stringstream ss;
     int rank = 8;
     int file = A;
@@ -158,6 +177,10 @@ std::string Board::getFENString() const {
         ss << getStringFromChessField(*getEnPassantTarget());
     } else {
         ss << '-';
+    }
+
+    if (includeMoveCount) {
+        ss << ' ' << _halfmoveClock << ' ' << _fullMoves;
     }
 
     return ss.str();
@@ -255,9 +278,9 @@ void Board::setEnPassantTarget(ChessField field) {
     _legality = Legality::UNDETERMINED;
 }
 
-Color Board::whosTurnIsIt() const { return _turn; }
+Color Board::whosTurnIsIt() const { return _whosTurn; }
 
-void Board::setTurn(Color color) { _turn = color; }
+void Board::setTurn(Color color) { _whosTurn = color; }
 
 std::optional<ChessField> Board::findFirstPiece(const std::function<bool(ChessPiece)>& predicate) const {
     for (int i = 0; i < 64; ++i) {
@@ -277,7 +300,8 @@ void Board::setLegality(Legality legality) { _legality = legality; }
 Legality Board::getLegality() const { return _legality; }
 
 bool Board::operator==(const Board& other) const {
-    return _board == other._board && _canCastle == other._canCastle && _enpassantTarget == other._enpassantTarget && _turn == other._turn;
+    return _board == other._board && _canCastle == other._canCastle && _enpassantTarget == other._enpassantTarget &&
+           _whosTurn == other._whosTurn;
 }
 
 bool Board::isLegalPosition() {

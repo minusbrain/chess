@@ -155,7 +155,7 @@ class Board {
      *
      * @return std::string FEN String
      */
-    std::string getFENString() const;
+    std::string getFENString(bool includeMoveCount = false) const;
 
     bool isLegalPosition();
 
@@ -176,6 +176,13 @@ class Board {
     std::optional<ChessField> findFirstPiece(const std::function<bool(ChessPiece)>& predicate) const;
     int countAllPieces(const std::function<bool(ChessPiece)>& predicate) const;
 
+    uint32_t getFullMoves() const { return _fullMoves; }
+    void incrementFullMove() { ++_fullMoves; }
+
+    uint32_t getHalfMoveClock() const { return _halfmoveClock; }
+    void incrementHalfMoveClock() { ++_halfmoveClock; }
+    void resetHalfMoveClock() { _halfmoveClock = 0; }
+
    private:
     void setLegality(Legality legality);
     Legality getLegality() const;
@@ -183,7 +190,10 @@ class Board {
     std::array<std::optional<ChessPiece>, 64> _board;
     base::flag_mask<Castling> _canCastle;
     std::optional<ChessField> _enpassantTarget;
-    Color _turn;
+    Color _whosTurn;
+    uint32_t _halfmoveClock;
+    uint32_t _fullMoves;
+
     Legality _legality;
 
     friend BoardFactory;

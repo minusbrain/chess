@@ -184,6 +184,8 @@ bool ChessRules::applyMove(Board& board, const Move& move) {
     auto startPiece = board.getPieceOnField(sf);
     auto endPiece = board.getPieceOnField(ef);
 
+    bool pawnOrCaptureMove = false;
+
     if (!startPiece.has_value() || startPiece.value() != cp) {
         return false;
     }
@@ -252,14 +254,6 @@ bool ChessRules::applyMove(Board& board, const Move& move) {
             else
                 board.unsetCastling(Board::Castling::BLACK_SHORT);
         }
-    } else if (move.hasModifier(MoveModifier::PROMOTE_QUEEN)) {
-        std::get<PieceIdx>(cp) = Piece::QUEEN;
-    } else if (move.hasModifier(MoveModifier::PROMOTE_BISHOP)) {
-        std::get<PieceIdx>(cp) = Piece::BISHOP;
-    } else if (move.hasModifier(MoveModifier::PROMOTE_KNIGHT)) {
-        std::get<PieceIdx>(cp) = Piece::KNIGHT;
-    } else if (move.hasModifier(MoveModifier::PROMOTE_ROOK)) {
-        std::get<PieceIdx>(cp) = Piece::ROOK;
     }
 
     auto piece = std::get<PieceIdx>(cp);
@@ -285,7 +279,21 @@ bool ChessRules::applyMove(Board& board, const Move& move) {
         }
     }
 
+    if (move.hasModifier(MoveModifier::CAPTURE)) {
+        pawnOrCaptureMove = true;
+    }
+
     if (piece == Piece::PAWN) {
+        pawnOrCaptureMove = true;
+        if (move.hasModifier(MoveModifier::PROMOTE_QUEEN)) {
+            std::get<PieceIdx>(cp) = Piece::QUEEN;
+        } else if (move.hasModifier(MoveModifier::PROMOTE_BISHOP)) {
+            std::get<PieceIdx>(cp) = Piece::BISHOP;
+        } else if (move.hasModifier(MoveModifier::PROMOTE_KNIGHT)) {
+            std::get<PieceIdx>(cp) = Piece::KNIGHT;
+        } else if (move.hasModifier(MoveModifier::PROMOTE_ROOK)) {
+            std::get<PieceIdx>(cp) = Piece::ROOK;
+        }
         int distance = std::abs(std::get<ChessRankIdx>(ef) - std::get<ChessRankIdx>(sf));
         if (distance == 2) {
             board.setEnPassantTarget(
@@ -300,6 +308,16 @@ bool ChessRules::applyMove(Board& board, const Move& move) {
     board.clearField(sf);
     board.setField(ef, cp);
     board.setTurn(getOppositeColor(movingColor));
+
+    if (movingColor == Color::BLACK) {
+        board.incrementFullMove();
+    }
+
+    if (pawnOrCaptureMove) {
+        board.resetHalfMoveClock();
+    } else {
+        board.incrementHalfMoveClock();
+    }
 
     return true;
 }
