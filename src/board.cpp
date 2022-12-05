@@ -13,6 +13,15 @@
 
 Board::Board() : _board(), _canCastle(0x00), _enpassantTarget(), _turn(Color::WHITE), _legality(Legality::UNDETERMINED) {}
 
+std::string getStringFromChessField(const ChessField& cf) {
+    std::stringstream ss;
+
+    ss << std::get<ChessFileIdx>(cf) - (char)1 + 'a';
+    ss << std::get<ChessRankIdx>(cf) + '0';
+
+    return ss.str();
+}
+
 ChessField getChessFieldFromString(std::string str) {
     char filechar = str[0];
     char rankchar = str[1];
@@ -82,15 +91,76 @@ Board::Board(const std::string& fen)
         Color turn = (fields[1] == "w" ? Color::WHITE : Color::BLACK);
         setTurn(turn);
 
-        if (fields[2].find('Q') != std::string::npos) setCastling(Board::Castling::WHITE_LONG);
-        if (fields[2].find('K') != std::string::npos) setCastling(Board::Castling::WHITE_SHORT);
-        if (fields[2].find('q') != std::string::npos) setCastling(Board::Castling::BLACK_LONG);
-        if (fields[2].find('k') != std::string::npos) setCastling(Board::Castling::BLACK_SHORT);
+        if (fields[2].find('Q') != std::string::npos) setCastling(Castling::WHITE_LONG);
+        if (fields[2].find('K') != std::string::npos) setCastling(Castling::WHITE_SHORT);
+        if (fields[2].find('q') != std::string::npos) setCastling(Castling::BLACK_LONG);
+        if (fields[2].find('k') != std::string::npos) setCastling(Castling::BLACK_SHORT);
 
         if (fields[3] != "-") {
             setEnPassantTarget(getChessFieldFromString(fields[3]));
         }
     }
+}
+
+std::string Board::getFENString() const {
+    std::stringstream ss;
+    int rank = 8;
+    int file = A;
+    int empty = 0;
+    bool first = true;
+    for (; rank > 0; --rank) {
+        if (!first) ss << '/';
+        first = false;
+        for (file = A; file <= H; ++file) {
+            auto piece = getPieceOnField(file, rank);
+            if (piece) {
+                if (empty > 0) {
+                    ss << empty;
+                    empty = 0;
+                }
+                ss << getDebugCharForPiece(*piece, true);
+            } else {
+                ++empty;
+            }
+        }
+        if (empty > 0) {
+            ss << empty;
+            empty = 0;
+        }
+    }
+    ss << ' ';
+    ss << (whosTurnIsIt() == Color::WHITE ? 'w' : 'b');
+    ss << ' ';
+    bool castle = false;
+    if (canCastle(Castling::WHITE_LONG)) {
+        ss << 'Q';
+        castle = true;
+    }
+    if (canCastle(Castling::WHITE_SHORT)) {
+        ss << 'K';
+        castle = true;
+    }
+    if (canCastle(Castling::BLACK_LONG)) {
+        ss << 'q';
+        castle = true;
+    }
+    if (canCastle(Castling::BLACK_SHORT)) {
+        ss << 'k';
+        castle = true;
+    }
+    if (!castle) {
+        ss << '-';
+    }
+
+    ss << ' ';
+
+    if (hasEnPassantTarget()) {
+        ss << getStringFromChessField(*getEnPassantTarget());
+    } else {
+        ss << '-';
+    }
+
+    return ss.str();
 }
 
 Board::~Board() {}

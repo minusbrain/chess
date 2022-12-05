@@ -150,6 +150,13 @@ class Board {
      */
     std::vector<ChessPieceOnField> getAllPieces(Color color) const;
 
+    /**
+     * @brief Return the FEN String representing the board.
+     *
+     * @return std::string FEN String
+     */
+    std::string getFENString() const;
+
     bool isLegalPosition();
 
     enum class Castling : char { WHITE_SHORT = 0x01, WHITE_LONG = 0x02, BLACK_SHORT = 0x04, BLACK_LONG = 0x08 };

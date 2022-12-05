@@ -263,3 +263,15 @@ TEST(TestBoardHelper, IndexToField_CornerFields_CorrectFields) {
     EXPECT_EQ((ChessField{A, 8}), BoardHelper::indexToField(56));
     EXPECT_EQ((ChessField{H, 8}), BoardHelper::indexToField(63));
 }
+
+TEST(TestChessBoard, FenStringLoop_1) {
+    std::string expected = "1k2Q1N1/1pB2B1n/8/2P2R2/5q2/K2R1b1B/qQR2Q2/3R4 w - -";
+    Board board = debugWrappedGetBoardFromFEN(expected);
+    EXPECT_EQ(expected, board.getFENString());
+}
+
+TEST(TestChessBoard, FenStringStartBoard) {
+    std::string expected = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w QKqk -";
+    Board board = debugWrappedGetStdBoard();
+    EXPECT_EQ(expected, board.getFENString());
+}
