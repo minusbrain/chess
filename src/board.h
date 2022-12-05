@@ -53,7 +53,12 @@ class Board {
     /**
      * @brief Construct a new chess-board object as a copy from an original
      */
-    Board(const Board& orig);
+    Board(const Board& orig) = default;
+
+    /**
+     * @brief Construct a new chess-board object from FEN String
+     */
+    Board(const std::string& fen);
 
     /**
      * @brief Destroy the chess-board object

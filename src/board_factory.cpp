@@ -1,61 +1,13 @@
 #include "board_factory.h"
 
-#include <base/strings.h>
 #include <fmt/core.h>
 #include <fmt/format.h>
 #include <fmt/ranges.h>
 
 #include "board.h"
-#include "common_debug.h"
 #include "types.h"
 
-ChessField getChessFieldFromString(std::string str) {
-    char filechar = str[0];
-    char rankchar = str[1];
-
-    ChessFile file = A;
-    switch (filechar) {
-        case 'a':
-        case 'A':
-            file = A;
-            break;
-        case 'b':
-        case 'B':
-            file = B;
-            break;
-        case 'c':
-        case 'C':
-            file = C;
-            break;
-        case 'd':
-        case 'D':
-            file = D;
-            break;
-        case 'e':
-        case 'E':
-            file = E;
-            break;
-        case 'f':
-        case 'F':
-            file = F;
-            break;
-        case 'g':
-        case 'G':
-            file = G;
-            break;
-        case 'h':
-        case 'H':
-            file = H;
-            break;
-    }
-
-    return ChessField{file, rankchar - 0x30};
-}
-
-Board BoardFactory::createEmptyBoard() {
-    Board board;
-    return board;
-}
+Board BoardFactory::createEmptyBoard() { return Board{}; }
 
 Board BoardFactory::createStandardBoard() {
     Board board;
@@ -103,42 +55,4 @@ Board BoardFactory::createStandardBoard() {
 // or        8/5k2/3p4/1p1Pp2p/pP2Pp1P/P4P1K/8/8
 // currently this assumes a valid FEN string and will fail in case of an invalid one
 // Todo: Sanity checks
-Board BoardFactory::createBoardFromFEN(std::string fen) {
-    Board board;
-
-    std::vector<std::string> fields = base::split(fen, ' ', 6);
-    std::vector<std::string> ranks = base::split(fields[0], '/', 8);
-
-    int rank = 8;
-    for (auto rankStr : ranks) {
-        int file = A;
-
-        for (char c : rankStr) {
-            if (c >= 0x31 && c <= 0x38) {
-                int skip = (c - 0x30);
-                file += skip;
-                continue;
-            }
-            ChessPiece cp = getChessPieceFromDebugChar(c);
-            board.setField({file, rank}, cp);
-            ++file;
-        }
-        --rank;
-    }
-
-    if (fields.size() > 1) {
-        Color turn = (fields[1] == "w" ? Color::WHITE : Color::BLACK);
-        board.setTurn(turn);
-
-        if (fields[2].find('Q') != std::string::npos) board.setCastling(Board::Castling::WHITE_LONG);
-        if (fields[2].find('K') != std::string::npos) board.setCastling(Board::Castling::WHITE_SHORT);
-        if (fields[2].find('q') != std::string::npos) board.setCastling(Board::Castling::BLACK_LONG);
-        if (fields[2].find('k') != std::string::npos) board.setCastling(Board::Castling::BLACK_SHORT);
-
-        if (fields[3] != "-") {
-            board.setEnPassantTarget(getChessFieldFromString(fields[3]));
-        }
-    }
-
-    return board;
-}
+Board BoardFactory::createBoardFromFEN(std::string fen) { return Board{fen}; }
