@@ -1,6 +1,6 @@
 #include "board_factory.h"
 
-#include <base/split.h>
+#include <base/strings.h>
 #include <fmt/core.h>
 #include <fmt/format.h>
 #include <fmt/ranges.h>
@@ -106,10 +106,8 @@ Board BoardFactory::createStandardBoard() {
 Board BoardFactory::createBoardFromFEN(std::string fen) {
     Board board;
 
-    std::vector<std::string> fields = base::split(fen, ' ');
-    std::vector<std::string> ranks = base::split(fields[0], '/');
-    // fmt::print("\nFields: {}", fields);
-    // fmt::print("\nRanks: {}", ranks);
+    std::vector<std::string> fields = base::split(fen, ' ', 6);
+    std::vector<std::string> ranks = base::split(fields[0], '/', 8);
 
     int rank = 8;
     for (auto rankStr : ranks) {
