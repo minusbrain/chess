@@ -53,3 +53,6 @@ latex/
 .cache/
 .vscode/
 compile_commands.json
+
+# chess
+example.fen
