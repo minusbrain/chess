@@ -3,6 +3,7 @@
 
 #include <iostream>
 
+#include "bench.h"
 #include "board.h"
 #include "board_debug.h"
 #include "board_factory.h"
@@ -12,6 +13,8 @@
 #include "types.h"
 
 using base::argparser;
+
+base::BenchmarkStatistics CHESS_BENCH;
 
 int main(int argc, char** argv) {
     std::string fen;
@@ -27,16 +30,19 @@ int main(int argc, char** argv) {
         Board board = BoardFactory::createBoardFromFEN(fen);
         if (!quiet) std::cout << "FEN String " << fen << board;
 
-        Legality legality = ChessRules::determineBoardPositionLegality(board);
-        if (!quiet) std::cout << "Board position is " << (legality == Legality::LEGAL ? "legal" : "illegal") << "\n";
+        bool legalPosition = board.isLegalPosition();
 
-        if (legality == Legality::LEGAL) {
+        if (!quiet) std::cout << "Board position is " << (legalPosition ? "legal" : "illegal") << "\n";
+
+        if (legalPosition) {
             auto validMoves = ChessRules::getAllValidMoves(board);
 
             if (!quiet)
                 std::cout << "Valid moves for " << (board.whosTurnIsIt() == Color::WHITE ? "white" : "black") << ": " << validMoves << "\n";
         }
     }
+
+    CHESS_BENCH.printStatistics();
 
     return 0;
 }

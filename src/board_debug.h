@@ -76,7 +76,7 @@ struct fmt::formatter<Board> {
             for (int row = 8; row > 0; --row) {
                 it = format_to(it, "{}", row);
                 for (int line = A; line <= H; ++line) {
-                    auto cp = board.getField(line, row);
+                    auto cp = board.getPieceOnField(line, row);
                     it = (cp.has_value() ? format_to(it, "{}", cp.value()) : format_to(it, " "));
                 }
                 it = format_to(it, "{}\n", row);
@@ -89,7 +89,7 @@ struct fmt::formatter<Board> {
                 it = format_to(it, "  |     |     |     |     |     |     |     |     |\n");
                 it = format_to(it, "{} ", row);
                 for (int line = 1; line <= H; ++line) {
-                    auto cp = board.getField(line, row);
+                    auto cp = board.getPieceOnField(line, row);
                     it = (cp.has_value() ? format_to(it, "|  {}  ", cp.value()) : format_to(it, "|     "));
                 }
                 it = format_to(it, "| {}\n  |     |     |     |     |     |     |     |     |\n", row);
@@ -112,7 +112,7 @@ inline std::ostream &operator<<(std::ostream &os, const Board &board) {
     for (int row = 8; row > 0; --row) {
         os << row;
         for (int line = A; line <= H; ++line) {
-            auto cp = board.getField(line, row);
+            auto cp = board.getPieceOnField(line, row);
             if (cp.has_value())
                 os << cp.value();
             else

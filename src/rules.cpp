@@ -5,6 +5,7 @@
 #include <cassert>
 #include <iostream>
 
+#include "bench.h"
 #include "board.h"
 #include "board_debug.h"
 #include "board_factory.h"
@@ -80,12 +81,12 @@ bool ChessRules::wouldMoveSelfIntoCheck(const Board& board, const Move& move) {
 
 std::vector<Move> ChessRules::getAllValidMoves(const Board& board, bool annotate) {
     std::vector<Move> validMoves;
-
-    auto potentialMoves = getAllPotentialMoves(board);
+    std::vector<Move> potentialMoves = getAllPotentialMoves(board);
 
     for (auto potentialMove : potentialMoves) {
         if (ChessRules::isMoveLegal(board, potentialMove)) validMoves.push_back(potentialMove);
     }
+
     if (annotate) annotateMoves(board, validMoves);
 
     return validMoves;
@@ -95,7 +96,7 @@ void ChessRules::annotateMoves(const Board& board, std::vector<Move>& moves) {
     for (auto& move : moves) {
         // std::cout << "\nApplying " << move << " to " << board << std::flush;
         Board resultingBoard(board);
-        assert(guardedApplyMove(resultingBoard, move));
+        applyMove(resultingBoard, move);
         bool check = isCheck(resultingBoard);
 
         if (isCheckMate(resultingBoard, check)) {
@@ -138,14 +139,14 @@ bool ChessRules::isCastlingLegal(const Board& board, const Move& potentialMove) 
     ChessRank castlingRank = (movingColor == Color::WHITE ? 1 : 8);
 
     if (potentialMove.hasModifier(MoveModifier::CASTLING_LONG)) {
-        if (board.getField({B, castlingRank}).has_value() || board.getField({C, castlingRank}).has_value() ||
-            board.getField({D, castlingRank}).has_value()) {
+        if (board.getPieceOnField({B, castlingRank}).has_value() || board.getPieceOnField({C, castlingRank}).has_value() ||
+            board.getPieceOnField({D, castlingRank}).has_value()) {
             return false;
         }
         return !isFieldCoveredByColor(board, ChessField{D, castlingRank}, getOppositeColor(movingColor));
 
     } else if (potentialMove.hasModifier(MoveModifier::CASTLING_SHORT)) {
-        if (board.getField({F, castlingRank}).has_value() || board.getField({G, castlingRank}).has_value()) {
+        if (board.getPieceOnField({F, castlingRank}).has_value() || board.getPieceOnField({G, castlingRank}).has_value()) {
             return false;
         }
         return !isFieldCoveredByColor(board, ChessField{F, castlingRank}, getOppositeColor(movingColor));
@@ -165,19 +166,11 @@ bool ChessRules::isMoveLegal(const Board& board, const Move& potentialMove) {
         }
     }
     if (potentialMove.hasModifier(MoveModifier::CAPTURE)) {
-        if (board.getField(potentialMove.getEndField()).has_value() &&
-            std::get<PieceIdx>(board.getField(potentialMove.getEndField()).value()) == Piece::KING)
+        if (board.getPieceOnField(potentialMove.getEndField()).has_value() &&
+            std::get<PieceIdx>(board.getPieceOnField(potentialMove.getEndField()).value()) == Piece::KING)
             return false;
     }
     return !wouldMoveSelfIntoCheck(board, potentialMove);
-}
-
-bool ChessRules::guardedApplyMove(Board& board, const Move& move) {
-    assert(determineBoardPositionLegality(board) == Legality::LEGAL);
-    bool ret = applyMove(board, move);
-
-    if (ret) assert(determineBoardPositionLegality(board) == Legality::LEGAL);
-    return ret;
 }
 
 bool ChessRules::applyMove(Board& board, const Move& move) {
@@ -188,8 +181,8 @@ bool ChessRules::applyMove(Board& board, const Move& move) {
     assert(BoardHelper::isInBounds(sf));
     assert(BoardHelper::isInBounds(ef));
 
-    auto startPiece = board.getField(sf);
-    auto endPiece = board.getField(ef);
+    auto startPiece = board.getPieceOnField(sf);
+    auto endPiece = board.getPieceOnField(ef);
 
     if (!startPiece.has_value() || startPiece.value() != cp) {
         return false;
@@ -205,7 +198,7 @@ bool ChessRules::applyMove(Board& board, const Move& move) {
         if (!epFieldOpt.has_value()) {
             return false;
         }
-        auto epTargetOpt = board.getField(epFieldOpt.value());
+        auto epTargetOpt = board.getPieceOnField(epFieldOpt.value());
         if (!epTargetOpt.has_value()) {
             return false;
         }
@@ -218,18 +211,18 @@ bool ChessRules::applyMove(Board& board, const Move& move) {
         ChessRank castlingRank = (movingColor == Color::WHITE ? 1 : 8);
 
         if (move.hasModifier(MoveModifier::CASTLING_LONG)) {
-            if (board.getField({B, castlingRank}).has_value() || board.getField({C, castlingRank}).has_value() ||
-                board.getField({D, castlingRank}).has_value()) {
+            if (board.getPieceOnField({B, castlingRank}).has_value() || board.getPieceOnField({C, castlingRank}).has_value() ||
+                board.getPieceOnField({D, castlingRank}).has_value()) {
                 return false;
             }
 
-            if (!board.getField({A, castlingRank}).has_value() ||
-                board.getField({A, castlingRank}).value() != ChessPiece{movingColor, Piece::ROOK}) {
+            if (!board.getPieceOnField({A, castlingRank}).has_value() ||
+                board.getPieceOnField({A, castlingRank}).value() != ChessPiece{movingColor, Piece::ROOK}) {
                 return false;
             }
 
-            if (!board.getField({E, castlingRank}).has_value() ||
-                board.getField({E, castlingRank}).value() != ChessPiece{movingColor, Piece::KING}) {
+            if (!board.getPieceOnField({E, castlingRank}).has_value() ||
+                board.getPieceOnField({E, castlingRank}).value() != ChessPiece{movingColor, Piece::KING}) {
                 return false;
             }
             board.clearField({A, castlingRank});
@@ -239,17 +232,17 @@ bool ChessRules::applyMove(Board& board, const Move& move) {
             else
                 board.unsetCastling(Board::Castling::BLACK_LONG);
         } else {
-            if (board.getField({F, castlingRank}).has_value() || board.getField({G, castlingRank}).has_value()) {
+            if (board.getPieceOnField({F, castlingRank}).has_value() || board.getPieceOnField({G, castlingRank}).has_value()) {
                 return false;
             }
 
-            if (!board.getField({H, castlingRank}).has_value() ||
-                board.getField({H, castlingRank}).value() != ChessPiece{movingColor, Piece::ROOK}) {
+            if (!board.getPieceOnField({H, castlingRank}).has_value() ||
+                board.getPieceOnField({H, castlingRank}).value() != ChessPiece{movingColor, Piece::ROOK}) {
                 return false;
             }
 
-            if (!board.getField({E, castlingRank}).has_value() ||
-                board.getField({E, castlingRank}).value() != ChessPiece{movingColor, Piece::KING}) {
+            if (!board.getPieceOnField({E, castlingRank}).has_value() ||
+                board.getPieceOnField({E, castlingRank}).value() != ChessPiece{movingColor, Piece::KING}) {
                 return false;
             }
             board.clearField({H, castlingRank});
@@ -313,11 +306,6 @@ bool ChessRules::applyMove(Board& board, const Move& move) {
 
 // IDEA: Return reason for illegal verdict
 Legality ChessRules::determineBoardPositionLegality(Board& board) {
-    if (board.getLegality() != Legality::UNDETERMINED) {
-        return board.getLegality();
-    }
-    board.setLegality(Legality::ILLEGAL);
-
     if (board.countAllPieces([](const ChessPiece& cp) { return cp == ChessPiece{Color::WHITE, Piece::KING}; }) != 1)
         return Legality::ILLEGAL;
     if (board.countAllPieces([](const ChessPiece& cp) { return cp == ChessPiece{Color::BLACK, Piece::KING}; }) != 1)
@@ -352,30 +340,30 @@ Legality ChessRules::determineBoardPositionLegality(Board& board) {
     if (board.countAllPieces([](const ChessPiece& cp) { return std::get<ColorIdx>(cp) == Color::BLACK; }) > 16) return Legality::ILLEGAL;
 
     if (board.canCastle(Board::Castling::WHITE_LONG)) {
-        if (!board.getField({A, 1}).has_value() || board.getField({A, 1}).value() != ChessPiece{Color::WHITE, Piece::ROOK})
+        if (!board.getPieceOnField({A, 1}).has_value() || board.getPieceOnField({A, 1}).value() != ChessPiece{Color::WHITE, Piece::ROOK})
             return Legality::ILLEGAL;
-        if (!board.getField({E, 1}).has_value() || board.getField({E, 1}).value() != ChessPiece{Color::WHITE, Piece::KING})
+        if (!board.getPieceOnField({E, 1}).has_value() || board.getPieceOnField({E, 1}).value() != ChessPiece{Color::WHITE, Piece::KING})
             return Legality::ILLEGAL;
     }
 
     if (board.canCastle(Board::Castling::WHITE_SHORT)) {
-        if (!board.getField({H, 1}).has_value() || board.getField({H, 1}).value() != ChessPiece{Color::WHITE, Piece::ROOK})
+        if (!board.getPieceOnField({H, 1}).has_value() || board.getPieceOnField({H, 1}).value() != ChessPiece{Color::WHITE, Piece::ROOK})
             return Legality::ILLEGAL;
-        if (!board.getField({E, 1}).has_value() || board.getField({E, 1}).value() != ChessPiece{Color::WHITE, Piece::KING})
+        if (!board.getPieceOnField({E, 1}).has_value() || board.getPieceOnField({E, 1}).value() != ChessPiece{Color::WHITE, Piece::KING})
             return Legality::ILLEGAL;
     }
 
     if (board.canCastle(Board::Castling::BLACK_LONG)) {
-        if (!board.getField({A, 8}).has_value() || board.getField({A, 8}).value() != ChessPiece{Color::BLACK, Piece::ROOK})
+        if (!board.getPieceOnField({A, 8}).has_value() || board.getPieceOnField({A, 8}).value() != ChessPiece{Color::BLACK, Piece::ROOK})
             return Legality::ILLEGAL;
-        if (!board.getField({E, 8}).has_value() || board.getField({E, 8}).value() != ChessPiece{Color::BLACK, Piece::KING})
+        if (!board.getPieceOnField({E, 8}).has_value() || board.getPieceOnField({E, 8}).value() != ChessPiece{Color::BLACK, Piece::KING})
             return Legality::ILLEGAL;
     }
 
     if (board.canCastle(Board::Castling::BLACK_SHORT)) {
-        if (!board.getField({H, 8}).has_value() || board.getField({H, 8}).value() != ChessPiece{Color::BLACK, Piece::ROOK})
+        if (!board.getPieceOnField({H, 8}).has_value() || board.getPieceOnField({H, 8}).value() != ChessPiece{Color::BLACK, Piece::ROOK})
             return Legality::ILLEGAL;
-        if (!board.getField({E, 8}).has_value() || board.getField({E, 8}).value() != ChessPiece{Color::BLACK, Piece::KING})
+        if (!board.getPieceOnField({E, 8}).has_value() || board.getPieceOnField({E, 8}).value() != ChessPiece{Color::BLACK, Piece::KING})
             return Legality::ILLEGAL;
     }
 
@@ -387,10 +375,12 @@ Legality ChessRules::determineBoardPositionLegality(Board& board) {
         if (rank != 3 && rank != 6)
             return Legality::ILLEGAL;
         else if (rank == 3) {
-            if (!board.getField({file, 4}).has_value() || board.getField({file, 4}).value() != ChessPiece{Color::WHITE, Piece::PAWN})
+            if (!board.getPieceOnField({file, 4}).has_value() ||
+                board.getPieceOnField({file, 4}).value() != ChessPiece{Color::WHITE, Piece::PAWN})
                 return Legality::ILLEGAL;
         } else {
-            if (!board.getField({file, 5}).has_value() || board.getField({file, 5}).value() != ChessPiece{Color::BLACK, Piece::PAWN})
+            if (!board.getPieceOnField({file, 5}).has_value() ||
+                board.getPieceOnField({file, 5}).value() != ChessPiece{Color::BLACK, Piece::PAWN})
                 return Legality::ILLEGAL;
         }
     }
@@ -402,8 +392,6 @@ Legality ChessRules::determineBoardPositionLegality(Board& board) {
     int rankDist = std::abs(std::get<ChessRankIdx>(whiteKing.value()) - std::get<ChessRankIdx>(blackKing.value()));
 
     if (fileDist <= 1 && rankDist <= 1) return Legality::ILLEGAL;
-
-    board.setLegality(Legality::LEGAL);
 
     return Legality::LEGAL;
 }

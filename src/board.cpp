@@ -43,11 +43,13 @@ void Board::clearField(ChessFile file, ChessRank rank) {
 void Board::clearField(ChessField field) { clearField(std::get<ChessFileIdx>(field), std::get<ChessRankIdx>(field)); }
 
 // Checked for hidden recursion: NO
-std::optional<ChessPiece> Board::getField(ChessFile file, ChessRank rank) const { return _board[BoardHelper::fieldToIndex({file, rank})]; }
+std::optional<ChessPiece> Board::getPieceOnField(ChessFile file, ChessRank rank) const {
+    return _board[BoardHelper::fieldToIndex({file, rank})];
+}
 
 // Checked for hidden recursion: NO
-std::optional<ChessPiece> Board::getField(ChessField field) const {
-    return getField(std::get<ChessFileIdx>(field), std::get<ChessRankIdx>(field));
+std::optional<ChessPiece> Board::getPieceOnField(ChessField field) const {
+    return getPieceOnField(std::get<ChessFileIdx>(field), std::get<ChessRankIdx>(field));
 }
 
 // Checked for hidden recursion: NO
@@ -141,13 +143,7 @@ std::optional<ChessField> Board::findFirstPiece(const std::function<bool(ChessPi
 
 // Checked for hidden recursion: NO
 int Board::countAllPieces(const std::function<bool(ChessPiece)>& predicate) const {
-    int count = 0;
-    for (int i = 0; i < 64; ++i) {
-        if (_board[i].has_value() && predicate(_board[i].value())) {
-            ++count;
-        }
-    }
-    return count;
+    return base::count_if(_board, [&predicate](auto& piece) { return piece && predicate(*piece); });
 }
 
 // Checked for hidden recursion: NO
@@ -157,4 +153,11 @@ Legality Board::getLegality() const { return _legality; }
 
 bool Board::operator==(const Board& other) const {
     return _board == other._board && _canCastle == other._canCastle && _enpassantTarget == other._enpassantTarget && _turn == other._turn;
+}
+
+bool Board::isLegalPosition() {
+    if (_legality == Legality::UNDETERMINED) {
+        _legality = ChessRules::determineBoardPositionLegality(*this);
+    }
+    return _legality == Legality::LEGAL;
 }

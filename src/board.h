@@ -7,6 +7,8 @@
 #include <optional>
 #include <vector>
 
+#include "board_factory.h"
+#include "rules.h"
 #include "types.h"
 
 class Move;
@@ -120,7 +122,7 @@ class Board {
      *
      * @returns Optional chess-piece that occupies the field
      */
-    std::optional<ChessPiece> getField(ChessFile line, ChessRank row) const;
+    std::optional<ChessPiece> getPieceOnField(ChessFile line, ChessRank row) const;
 
     /**
      * @brief Return the chess-piece that is on a field of the board
@@ -133,7 +135,7 @@ class Board {
      *
      * @returns Optional chess-piece that occupies the field
      */
-    std::optional<ChessPiece> getField(ChessField field) const;
+    std::optional<ChessPiece> getPieceOnField(ChessField field) const;
 
     /**
      * @brief Get the All Pieces of one color currently on the board
@@ -142,6 +144,8 @@ class Board {
      * @return Set of pieces currently on the board
      */
     std::vector<ChessPieceOnField> getAllPieces(Color color) const;
+
+    bool isLegalPosition();
 
     enum class Castling : char { WHITE_SHORT = 0x01, WHITE_LONG = 0x02, BLACK_SHORT = 0x04, BLACK_LONG = 0x08 };
     bool canCastle(Castling castling) const;
@@ -157,16 +161,18 @@ class Board {
     Color whosTurnIsIt() const;
     void setTurn(Color);
 
-    void setLegality(Legality legality);
-    Legality getLegality() const;
-
     std::optional<ChessField> findFirstPiece(const std::function<bool(ChessPiece)>& predicate) const;
     int countAllPieces(const std::function<bool(ChessPiece)>& predicate) const;
 
    private:
+    void setLegality(Legality legality);
+    Legality getLegality() const;
+
     std::array<std::optional<ChessPiece>, 64> _board;
     base::flag_mask<Castling> _canCastle;
     std::optional<ChessField> _enpassantTarget;
     Color _turn;
     Legality _legality;
+
+    friend BoardFactory;
 };

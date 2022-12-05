@@ -37,7 +37,7 @@ std::vector<Move> debugWrappedGetAllValidMoves(const Board& board) {
 }
 
 bool debugWrappedApplyMove(Board& board, const Move& move) {
-    bool ret = ChessRules::guardedApplyMove(board, move);
+    bool ret = ChessRules::applyMove(board, move);
     if (CMD_OPTIONS.is_flag_set("debug")) {
         std::cout << "Applying move " << move << "\nResulting board" << board << std::flush;
     }

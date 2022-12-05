@@ -23,11 +23,8 @@ class ChessRules {
     static bool wouldMoveSelfIntoCheck(const Board& board, const Move& move);
     static bool isFieldCoveredByColor(const Board& board, const ChessField& field, Color color);
 
-    static bool guardedApplyMove(Board& board, const Move& move);
-
     static Legality determineBoardPositionLegality(Board& board);
 
-   private:
     /**
      * @brief Applies the requested move. Only very rudimentary checks are applied
      *

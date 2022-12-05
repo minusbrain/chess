@@ -7,8 +7,19 @@
 
 #include "board.h"
 #include "move.h"
+#include "types.h"
 
-bool addMoveOrIsBlocked(const Board& board, ChessField potentialMoveField, std::vector<Move>& potentialMoves,
+/**
+ * @brief Adds move to potentitalMoves if field is available and returns whether search can
+ *
+ * @param board The board to analyze
+ * @param potentialMoveField The field to move to potentially
+ * @param potentialMoves The potentialMoves to add this move to if available
+ * @param pieceOnField The piece on the board that shall move
+ * @return true     In case the field is blocked and the search can be stopped (can also be a capture move)
+ * @return false    In case the field is available to be moved to and the search shall continue
+ */
+bool addMoveOrIsBlocked(const Board& board, const ChessField& potentialMoveField, std::vector<Move>& potentialMoves,
                         const ChessPieceOnField& pieceOnField) {
     ChessPiece cp = std::get<ChessPieceIdx>(pieceOnField);
     Color color = std::get<ColorIdx>(cp);
@@ -18,12 +29,14 @@ bool addMoveOrIsBlocked(const Board& board, ChessField potentialMoveField, std::
         std::get<ChessRankIdx>(potentialMoveField) < 1 || std::get<ChessRankIdx>(potentialMoveField) > 8)
         return true;
 
-    if (!board.getField(potentialMoveField).has_value()) {
-        potentialMoves.push_back(Move{cp, currentField, potentialMoveField});
-    } else if (std::get<ColorIdx>(board.getField(potentialMoveField).value()) == color) {
+    auto pieceOnMoveField = board.getPieceOnField(potentialMoveField);
+
+    if (!pieceOnMoveField) {
+        potentialMoves.emplace_back(cp, currentField, potentialMoveField);
+    } else if (std::get<ColorIdx>(*pieceOnMoveField) == color) {
         return true;
     } else {
-        potentialMoves.push_back(Move{cp, currentField, potentialMoveField, {MoveModifier::CAPTURE}});
+        potentialMoves.emplace_back(cp, currentField, potentialMoveField, std::set<MoveModifier>{MoveModifier::CAPTURE});
         return true;
     }
     return false;
@@ -31,6 +44,7 @@ bool addMoveOrIsBlocked(const Board& board, ChessField potentialMoveField, std::
 
 std::vector<Move> PawnRules::getPotentialMoves(const Board& board, ChessPieceOnField pieceOnField) {
     std::vector<Move> potentialMoves;
+    potentialMoves.reserve(4);
 
     ChessPiece cp = std::get<ChessPieceIdx>(pieceOnField);
     Color color = std::get<ColorIdx>(cp);
@@ -44,7 +58,7 @@ std::vector<Move> PawnRules::getPotentialMoves(const Board& board, ChessPieceOnF
     int direction = (color == Color::WHITE ? 1 : -1);
 
     ChessField potentialEndField = {currentFile, currentRank + direction};
-    if (!board.getField(potentialEndField).has_value()) {
+    if (!board.getPieceOnField(potentialEndField).has_value()) {
         Move singleStep = {cp, currentField, potentialEndField};
 
         if (std::get<ChessRankIdx>(potentialEndField) == 8 || std::get<ChessRankIdx>(potentialEndField) == 1) {
@@ -67,7 +81,7 @@ std::vector<Move> PawnRules::getPotentialMoves(const Board& board, ChessPieceOnF
         if (currentRank == doubleMoveRank) {
             // Double step from rank 2 or 7
             std::get<ChessRankIdx>(potentialEndField) = currentRank + (2 * direction);
-            if (!board.getField(potentialEndField).has_value()) {
+            if (!board.getPieceOnField(potentialEndField).has_value()) {
                 Move doubleStep = {cp, currentField, potentialEndField};
                 potentialMoves.push_back(doubleStep);
             }
@@ -75,7 +89,7 @@ std::vector<Move> PawnRules::getPotentialMoves(const Board& board, ChessPieceOnF
     }
     if (currentFile != A) {
         ChessField potentialCaptureTargetField = {currentFile - 1, currentRank + direction};
-        auto potentialCaptureTarget = board.getField(potentialCaptureTargetField);
+        auto potentialCaptureTarget = board.getPieceOnField(potentialCaptureTargetField);
         if (potentialCaptureTarget.has_value() && std::get<ColorIdx>(potentialCaptureTarget.value()) != color) {
             Move captureMove = {cp, currentField, potentialCaptureTargetField};
             if (std::get<ChessRankIdx>(potentialCaptureTargetField) == 8 || std::get<ChessRankIdx>(potentialCaptureTargetField) == 1) {
@@ -93,21 +107,21 @@ std::vector<Move> PawnRules::getPotentialMoves(const Board& board, ChessPieceOnF
                 captureMove.clearModifiers();
                 captureMove.addModifier(MoveModifier::CAPTURE);
                 captureMove.addModifier(MoveModifier::PROMOTE_QUEEN);
-                potentialMoves.push_back(captureMove);
+                potentialMoves.push_back(std::move(captureMove));
             } else {
                 captureMove.addModifier(MoveModifier::CAPTURE);
-                potentialMoves.push_back(captureMove);
+                potentialMoves.push_back(std::move(captureMove));
             }
         } else if (potentialCaptureTargetField == board.getEnPassantTarget()) {
-            Move captureMove = {cp, currentField, potentialCaptureTargetField, {MoveModifier::CAPTURE, MoveModifier::EN_PASSANT}};
-            potentialMoves.push_back(captureMove);
+            potentialMoves.emplace_back(cp, currentField, potentialCaptureTargetField,
+                                        std::set<MoveModifier>{MoveModifier::CAPTURE, MoveModifier::EN_PASSANT});
         }
     }
     if (currentFile != H) {
         ChessField potentialCaptureTargetField = {currentFile + 1, currentRank + direction};
-        auto potentialCaptureTarget = board.getField(potentialCaptureTargetField);
+        auto potentialCaptureTarget = board.getPieceOnField(potentialCaptureTargetField);
         if (potentialCaptureTarget.has_value() && std::get<ColorIdx>(potentialCaptureTarget.value()) != color) {
-            Move captureMove = {cp, currentField, potentialCaptureTargetField, {MoveModifier::CAPTURE}};
+            Move captureMove = {cp, currentField, potentialCaptureTargetField};
             if (std::get<ChessRankIdx>(potentialCaptureTargetField) == 8 || std::get<ChessRankIdx>(potentialCaptureTargetField) == 1) {
                 captureMove.addModifier(MoveModifier::CAPTURE);
                 captureMove.addModifier(MoveModifier::PROMOTE_BISHOP);
@@ -123,14 +137,14 @@ std::vector<Move> PawnRules::getPotentialMoves(const Board& board, ChessPieceOnF
                 captureMove.clearModifiers();
                 captureMove.addModifier(MoveModifier::CAPTURE);
                 captureMove.addModifier(MoveModifier::PROMOTE_QUEEN);
-                potentialMoves.push_back(captureMove);
+                potentialMoves.push_back(std::move(captureMove));
             } else {
                 captureMove.addModifier(MoveModifier::CAPTURE);
-                potentialMoves.push_back(captureMove);
+                potentialMoves.push_back(std::move(captureMove));
             }
         } else if (potentialCaptureTargetField == board.getEnPassantTarget()) {
-            Move captureMove = {cp, currentField, potentialCaptureTargetField, {MoveModifier::CAPTURE, MoveModifier::EN_PASSANT}};
-            potentialMoves.push_back(captureMove);
+            potentialMoves.emplace_back(cp, currentField, potentialCaptureTargetField,
+                                        std::set<MoveModifier>{MoveModifier::CAPTURE, MoveModifier::EN_PASSANT});
         }
     }
 
@@ -141,6 +155,7 @@ char PawnRules::getDebugChar(Color color) { return color == Color::WHITE ? 'P' :
 
 std::vector<Move> BishopRules::getPotentialMoves(const Board& board, ChessPieceOnField pieceOnField) {
     std::vector<Move> potentialMoves;
+    potentialMoves.reserve(14);
     ChessField currentField = std::get<ChessFieldIdx>(pieceOnField);
     ChessFile currentFile = std::get<ChessFileIdx>(currentField);
     ChessFile currentRank = std::get<ChessRankIdx>(currentField);
@@ -172,6 +187,7 @@ char BishopRules::getDebugChar(Color color) { return color == Color::WHITE ? 'B'
 
 std::vector<Move> KnightRules::getPotentialMoves(const Board& board, ChessPieceOnField pieceOnField) {
     std::vector<Move> potentialMoves;
+    potentialMoves.reserve(8);
     ChessField currentField = std::get<ChessFieldIdx>(pieceOnField);
     ChessFile currentFile = std::get<ChessFileIdx>(currentField);
     ChessFile currentRank = std::get<ChessRankIdx>(currentField);
@@ -192,6 +208,7 @@ char KnightRules::getDebugChar(Color color) { return color == Color::WHITE ? 'N'
 
 std::vector<Move> RookRules::getPotentialMoves(const Board& board, ChessPieceOnField pieceOnField) {
     std::vector<Move> potentialMoves;
+    potentialMoves.reserve(14);
     ChessField currentField = std::get<ChessFieldIdx>(pieceOnField);
     ChessFile currentFile = std::get<ChessFileIdx>(currentField);
     ChessRank currentRank = std::get<ChessRankIdx>(currentField);
@@ -223,6 +240,7 @@ char RookRules::getDebugChar(Color color) { return color == Color::WHITE ? 'R' :
 
 std::vector<Move> QueenRules::getPotentialMoves(const Board& board, ChessPieceOnField pieceOnField) {
     std::vector<Move> potentialMoves;
+    potentialMoves.reserve(28);
     RookRules rook;
     BishopRules bishop;
 
@@ -236,6 +254,7 @@ char QueenRules::getDebugChar(Color color) { return color == Color::WHITE ? 'Q' 
 
 std::vector<Move> KingRules::getPotentialMoves(const Board& board, ChessPieceOnField pieceOnField) {
     std::vector<Move> potentialMoves;
+    potentialMoves.reserve(8);
     ChessPiece cp = std::get<ChessPieceIdx>(pieceOnField);
     ChessField currentField = std::get<ChessFieldIdx>(pieceOnField);
     ChessFile currentFile = std::get<ChessFileIdx>(currentField);
@@ -252,24 +271,26 @@ std::vector<Move> KingRules::getPotentialMoves(const Board& board, ChessPieceOnF
 
     if (board.whosTurnIsIt() == Color::WHITE) {
         if (board.canCastle(Board::Castling::WHITE_LONG)) {
-            if (!board.getField({B, 1}).has_value() && !board.getField({C, 1}).has_value() && !board.getField({D, 1}).has_value()) {
-                potentialMoves.push_back(Move{cp, currentField, {C, 1}, {MoveModifier::CASTLING_LONG}});
+            if (!board.getPieceOnField({B, 1}).has_value() && !board.getPieceOnField({C, 1}).has_value() &&
+                !board.getPieceOnField({D, 1}).has_value()) {
+                potentialMoves.emplace_back(cp, currentField, ChessField{C, 1}, std::set<MoveModifier>{MoveModifier::CASTLING_LONG});
             }
         }
         if (board.canCastle(Board::Castling::WHITE_SHORT)) {
-            if (!board.getField({F, 1}).has_value() && !board.getField({G, 1}).has_value()) {
-                potentialMoves.push_back(Move{cp, currentField, {G, 1}, {MoveModifier::CASTLING_SHORT}});
+            if (!board.getPieceOnField({F, 1}).has_value() && !board.getPieceOnField({G, 1}).has_value()) {
+                potentialMoves.emplace_back(cp, currentField, ChessField{G, 1}, std::set<MoveModifier>{MoveModifier::CASTLING_SHORT});
             }
         }
     } else {
         if (board.canCastle(Board::Castling::BLACK_LONG)) {
-            if (!board.getField({B, 8}).has_value() && !board.getField({C, 8}).has_value() && !board.getField({D, 8}).has_value()) {
-                potentialMoves.push_back(Move{cp, currentField, {C, 8}, {MoveModifier::CASTLING_LONG}});
+            if (!board.getPieceOnField({B, 8}).has_value() && !board.getPieceOnField({C, 8}).has_value() &&
+                !board.getPieceOnField({D, 8}).has_value()) {
+                potentialMoves.emplace_back(cp, currentField, ChessField{C, 8}, std::set<MoveModifier>{MoveModifier::CASTLING_LONG});
             }
         }
         if (board.canCastle(Board::Castling::BLACK_SHORT)) {
-            if (!board.getField({F, 8}).has_value() && !board.getField({G, 8}).has_value()) {
-                potentialMoves.push_back(Move{cp, currentField, {G, 8}, {MoveModifier::CASTLING_SHORT}});
+            if (!board.getPieceOnField({F, 8}).has_value() && !board.getPieceOnField({G, 8}).has_value()) {
+                potentialMoves.emplace_back(cp, currentField, ChessField{G, 8}, std::set<MoveModifier>{MoveModifier::CASTLING_SHORT});
             }
         }
     }

@@ -9,7 +9,7 @@
 TEST(TestChessBoard, A1ShouldBeEmptyOnAnEmptyBoard) {
     Board board = BoardFactory::createEmptyBoard();
 
-    EXPECT_EQ(std::nullopt, board.getField(A, 1));
+    EXPECT_EQ(std::nullopt, board.getPieceOnField(A, 1));
 }
 
 TEST(TestChessBoard, GetAllPieces_WhiteOnStandardBoard_16Pieces) {
@@ -31,9 +31,9 @@ TEST(TestChessBoard, ApplyMove_legalMoveNoCapture_AllowAndProperPostConditions) 
     Move move = Move({Color::WHITE, Piece::PAWN}, {A, 2}, {A, 4});
 
     EXPECT_TRUE(debugWrappedApplyMove(board, move));
-    EXPECT_FALSE(board.getField({A, 2}).has_value());
-    EXPECT_TRUE(board.getField({A, 4}).has_value());
-    EXPECT_EQ((ChessPiece{Color::WHITE, Piece::PAWN}), board.getField({A, 4}).value());
+    EXPECT_FALSE(board.getPieceOnField({A, 2}).has_value());
+    EXPECT_TRUE(board.getPieceOnField({A, 4}).has_value());
+    EXPECT_EQ((ChessPiece{Color::WHITE, Piece::PAWN}), board.getPieceOnField({A, 4}).value());
 }
 
 TEST(TestChessBoard, ApplyMove_MoveOnOccupiedFieldButNoCapture_DisallowAndNothingChanged) {
@@ -50,9 +50,9 @@ TEST(TestChessBoard, ApplyMove_MoveOnOccupiedFieldCapture_AllowAndProperPostCond
     Move move = Move({Color::WHITE, Piece::PAWN}, {A, 2}, {A, 7}, {MoveModifier::CAPTURE});
 
     EXPECT_TRUE(debugWrappedApplyMove(board, move));
-    EXPECT_FALSE(board.getField({A, 2}).has_value());
-    EXPECT_TRUE(board.getField({A, 7}).has_value());
-    EXPECT_EQ((ChessPiece{Color::WHITE, Piece::PAWN}), board.getField({A, 7}).value());
+    EXPECT_FALSE(board.getPieceOnField({A, 2}).has_value());
+    EXPECT_TRUE(board.getPieceOnField({A, 7}).has_value());
+    EXPECT_EQ((ChessPiece{Color::WHITE, Piece::PAWN}), board.getPieceOnField({A, 7}).value());
 }
 
 TEST(TestChessBoard, ApplyMove_MoveFromEmptyField_DisallowAndNothingChanged) {
@@ -86,10 +86,10 @@ TEST(TestChessBoard, ApplyMove_ValidEnPassant_AllowAndProperPostCondition) {
     auto board = debugWrappedGetBoardFromFEN("rnbqkbnr/1ppppppp/8/pP6/8/8/P1PPPPPP/RNBQKBNR w KQkq a6");
     Move move = Move({Color::WHITE, Piece::PAWN}, {B, 5}, {A, 6}, {MoveModifier::CAPTURE, MoveModifier::EN_PASSANT});
     EXPECT_TRUE(debugWrappedApplyMove(board, move));
-    EXPECT_FALSE(board.getField({A, 5}).has_value());
-    EXPECT_FALSE(board.getField({B, 5}).has_value());
-    EXPECT_TRUE(board.getField({A, 6}).has_value());
-    EXPECT_EQ((ChessPiece{Color::WHITE, Piece::PAWN}), board.getField({A, 6}).value());
+    EXPECT_FALSE(board.getPieceOnField({A, 5}).has_value());
+    EXPECT_FALSE(board.getPieceOnField({B, 5}).has_value());
+    EXPECT_TRUE(board.getPieceOnField({A, 6}).has_value());
+    EXPECT_EQ((ChessPiece{Color::WHITE, Piece::PAWN}), board.getPieceOnField({A, 6}).value());
 }
 
 TEST(TestChessBoard, ApplyMove_EnPassantButNoCapture_DisallowAndNothingChanged) {
@@ -104,12 +104,12 @@ TEST(TestChessBoard, ApplyMove_EnPassantButNoCapture_DisallowAndNothingChanged) 
 TEST(TestChessBoard, ApplyMove_EnPassantButNoTarget_DisallowAndNothingChanged) {
     auto board = debugWrappedGetBoardFromFEN("rnbqkbnr/pppppppp/8/1P6/8/8/P1PPPPPP/RNBQKBNR w KQkq a6");
 
-    EXPECT_EQ(Legality::ILLEGAL, ChessRules::determineBoardPositionLegality(board));
+    EXPECT_FALSE(board.isLegalPosition());
 }
 
 TEST(TestChessBoard, ApplyMove_EnPassantButOwnTarget_DisallowAndNothingChanged) {
     auto board = debugWrappedGetBoardFromFEN("rnbqkbnr/pppppppp/8/PP6/8/8/2PPPPPP/RNBQKBNR b KQkq a6");
-    EXPECT_EQ(Legality::ILLEGAL, ChessRules::determineBoardPositionLegality(board));
+    EXPECT_FALSE(board.isLegalPosition());
 }
 
 TEST(TestChessBoard, ApplyMove_EnPassantButWrongdistance_DisallowAndNothingChanged) {
@@ -135,8 +135,8 @@ TEST(TestChessBoard, ApplyMove_PawnPromotionToQueen_AllowAndProperPostCondition)
     Move move = Move({Color::WHITE, Piece::PAWN}, {E, 7}, {E, 8}, {MoveModifier::PROMOTE_QUEEN});
 
     EXPECT_TRUE(debugWrappedApplyMove(board, move));
-    EXPECT_EQ((ChessPiece{Color::WHITE, Piece::QUEEN}), board.getField({E, 8}).value());
-    EXPECT_FALSE(board.getField({E, 7}).has_value());
+    EXPECT_EQ((ChessPiece{Color::WHITE, Piece::QUEEN}), board.getPieceOnField({E, 8}).value());
+    EXPECT_FALSE(board.getPieceOnField({E, 7}).has_value());
 }
 
 TEST(TestChessBoard, ApplyMove_PawnPromotionToBishop_AllowAndProperPostCondition) {
@@ -144,8 +144,8 @@ TEST(TestChessBoard, ApplyMove_PawnPromotionToBishop_AllowAndProperPostCondition
     Move move = Move({Color::WHITE, Piece::PAWN}, {E, 7}, {E, 8}, {MoveModifier::PROMOTE_BISHOP});
 
     EXPECT_TRUE(debugWrappedApplyMove(board, move));
-    EXPECT_EQ((ChessPiece{Color::WHITE, Piece::BISHOP}), board.getField({E, 8}).value());
-    EXPECT_FALSE(board.getField({E, 7}).has_value());
+    EXPECT_EQ((ChessPiece{Color::WHITE, Piece::BISHOP}), board.getPieceOnField({E, 8}).value());
+    EXPECT_FALSE(board.getPieceOnField({E, 7}).has_value());
 }
 
 TEST(TestChessBoard, ApplyMove_PawnPromotionToRook_AllowAndProperPostCondition) {
@@ -153,8 +153,8 @@ TEST(TestChessBoard, ApplyMove_PawnPromotionToRook_AllowAndProperPostCondition) 
     Move move = Move({Color::WHITE, Piece::PAWN}, {E, 7}, {E, 8}, {MoveModifier::PROMOTE_ROOK});
 
     EXPECT_TRUE(debugWrappedApplyMove(board, move));
-    EXPECT_EQ((ChessPiece{Color::WHITE, Piece::ROOK}), board.getField({E, 8}).value());
-    EXPECT_FALSE(board.getField({E, 7}).has_value());
+    EXPECT_EQ((ChessPiece{Color::WHITE, Piece::ROOK}), board.getPieceOnField({E, 8}).value());
+    EXPECT_FALSE(board.getPieceOnField({E, 7}).has_value());
 }
 
 TEST(TestChessBoard, ApplyMove_PawnPromotionToKnight_AllowAndProperPostCondition) {
@@ -162,8 +162,8 @@ TEST(TestChessBoard, ApplyMove_PawnPromotionToKnight_AllowAndProperPostCondition
     Move move = Move({Color::WHITE, Piece::PAWN}, {E, 7}, {E, 8}, {MoveModifier::PROMOTE_KNIGHT});
 
     EXPECT_TRUE(debugWrappedApplyMove(board, move));
-    EXPECT_EQ((ChessPiece{Color::WHITE, Piece::KNIGHT}), board.getField({E, 8}).value());
-    EXPECT_FALSE(board.getField({E, 7}).has_value());
+    EXPECT_EQ((ChessPiece{Color::WHITE, Piece::KNIGHT}), board.getPieceOnField({E, 8}).value());
+    EXPECT_FALSE(board.getPieceOnField({E, 7}).has_value());
 }
 
 TEST(TestChessBoard, ApplyMove_PawnCapturePromotionToQueen_AllowAndProperPostCondition) {
@@ -171,9 +171,9 @@ TEST(TestChessBoard, ApplyMove_PawnCapturePromotionToQueen_AllowAndProperPostCon
     Move move = Move({Color::WHITE, Piece::PAWN}, {E, 7}, {D, 8}, {MoveModifier::PROMOTE_QUEEN, MoveModifier::CAPTURE});
 
     EXPECT_TRUE(debugWrappedApplyMove(board, move));
-    EXPECT_EQ((ChessPiece{Color::WHITE, Piece::QUEEN}), board.getField({D, 8}).value());
-    EXPECT_FALSE(board.getField({E, 7}).has_value());
-    EXPECT_FALSE(board.getField({E, 8}).has_value());
+    EXPECT_EQ((ChessPiece{Color::WHITE, Piece::QUEEN}), board.getPieceOnField({D, 8}).value());
+    EXPECT_FALSE(board.getPieceOnField({E, 7}).has_value());
+    EXPECT_FALSE(board.getPieceOnField({E, 8}).has_value());
 }
 
 TEST(TestChessBoard, ApplyMove_PawnCapturePromotionToBishop_AllowAndProperPostCondition) {
@@ -181,9 +181,9 @@ TEST(TestChessBoard, ApplyMove_PawnCapturePromotionToBishop_AllowAndProperPostCo
     Move move = Move({Color::WHITE, Piece::PAWN}, {E, 7}, {D, 8}, {MoveModifier::PROMOTE_BISHOP, MoveModifier::CAPTURE});
 
     EXPECT_TRUE(debugWrappedApplyMove(board, move));
-    EXPECT_EQ((ChessPiece{Color::WHITE, Piece::BISHOP}), board.getField({D, 8}).value());
-    EXPECT_FALSE(board.getField({E, 7}).has_value());
-    EXPECT_FALSE(board.getField({E, 8}).has_value());
+    EXPECT_EQ((ChessPiece{Color::WHITE, Piece::BISHOP}), board.getPieceOnField({D, 8}).value());
+    EXPECT_FALSE(board.getPieceOnField({E, 7}).has_value());
+    EXPECT_FALSE(board.getPieceOnField({E, 8}).has_value());
 }
 
 TEST(TestChessBoard, ApplyMove_PawnCapturePromotionToRook_AllowAndProperPostCondition) {
@@ -191,9 +191,9 @@ TEST(TestChessBoard, ApplyMove_PawnCapturePromotionToRook_AllowAndProperPostCond
     Move move = Move({Color::WHITE, Piece::PAWN}, {E, 7}, {D, 8}, {MoveModifier::PROMOTE_ROOK, MoveModifier::CAPTURE});
 
     EXPECT_TRUE(debugWrappedApplyMove(board, move));
-    EXPECT_EQ((ChessPiece{Color::WHITE, Piece::ROOK}), board.getField({D, 8}).value());
-    EXPECT_FALSE(board.getField({E, 7}).has_value());
-    EXPECT_FALSE(board.getField({E, 8}).has_value());
+    EXPECT_EQ((ChessPiece{Color::WHITE, Piece::ROOK}), board.getPieceOnField({D, 8}).value());
+    EXPECT_FALSE(board.getPieceOnField({E, 7}).has_value());
+    EXPECT_FALSE(board.getPieceOnField({E, 8}).has_value());
 }
 
 TEST(TestChessBoard, ApplyMove_PawnCapturePromotionToKnight_AllowAndProperPostCondition) {
@@ -201,9 +201,9 @@ TEST(TestChessBoard, ApplyMove_PawnCapturePromotionToKnight_AllowAndProperPostCo
     Move move = Move({Color::WHITE, Piece::PAWN}, {E, 7}, {D, 8}, {MoveModifier::PROMOTE_KNIGHT, MoveModifier::CAPTURE});
 
     EXPECT_TRUE(debugWrappedApplyMove(board, move));
-    EXPECT_EQ((ChessPiece{Color::WHITE, Piece::KNIGHT}), board.getField({D, 8}).value());
-    EXPECT_FALSE(board.getField({E, 7}).has_value());
-    EXPECT_FALSE(board.getField({E, 8}).has_value());
+    EXPECT_EQ((ChessPiece{Color::WHITE, Piece::KNIGHT}), board.getPieceOnField({D, 8}).value());
+    EXPECT_FALSE(board.getPieceOnField({E, 7}).has_value());
+    EXPECT_FALSE(board.getPieceOnField({E, 8}).has_value());
 }
 
 TEST(TestChessBoard, ApplyMove_WhiteLongCastling_AllowAndProperPostCondition) {
@@ -211,10 +211,10 @@ TEST(TestChessBoard, ApplyMove_WhiteLongCastling_AllowAndProperPostCondition) {
     Move move = Move({Color::WHITE, Piece::KING}, {E, 1}, {C, 1}, {MoveModifier::CASTLING_LONG});
 
     EXPECT_TRUE(debugWrappedApplyMove(board, move));
-    EXPECT_EQ((ChessPiece{Color::WHITE, Piece::KING}), board.getField({C, 1}).value());
-    EXPECT_EQ((ChessPiece{Color::WHITE, Piece::ROOK}), board.getField({D, 1}).value());
-    EXPECT_FALSE(board.getField({A, 1}).has_value());
-    EXPECT_FALSE(board.getField({E, 1}).has_value());
+    EXPECT_EQ((ChessPiece{Color::WHITE, Piece::KING}), board.getPieceOnField({C, 1}).value());
+    EXPECT_EQ((ChessPiece{Color::WHITE, Piece::ROOK}), board.getPieceOnField({D, 1}).value());
+    EXPECT_FALSE(board.getPieceOnField({A, 1}).has_value());
+    EXPECT_FALSE(board.getPieceOnField({E, 1}).has_value());
 }
 
 TEST(TestChessBoard, ApplyMove_WhiteShortCastling_AllowAndProperPostCondition) {
@@ -222,10 +222,10 @@ TEST(TestChessBoard, ApplyMove_WhiteShortCastling_AllowAndProperPostCondition) {
     Move move = Move({Color::WHITE, Piece::KING}, {E, 1}, {G, 1}, {MoveModifier::CASTLING_SHORT});
 
     EXPECT_TRUE(debugWrappedApplyMove(board, move));
-    EXPECT_EQ((ChessPiece{Color::WHITE, Piece::KING}), board.getField({G, 1}).value());
-    EXPECT_EQ((ChessPiece{Color::WHITE, Piece::ROOK}), board.getField({F, 1}).value());
-    EXPECT_FALSE(board.getField({H, 1}).has_value());
-    EXPECT_FALSE(board.getField({E, 1}).has_value());
+    EXPECT_EQ((ChessPiece{Color::WHITE, Piece::KING}), board.getPieceOnField({G, 1}).value());
+    EXPECT_EQ((ChessPiece{Color::WHITE, Piece::ROOK}), board.getPieceOnField({F, 1}).value());
+    EXPECT_FALSE(board.getPieceOnField({H, 1}).has_value());
+    EXPECT_FALSE(board.getPieceOnField({E, 1}).has_value());
 }
 
 TEST(TestChessBoard, ApplyMove_BlackLongCastling_AllowAndProperPostCondition) {
@@ -233,10 +233,10 @@ TEST(TestChessBoard, ApplyMove_BlackLongCastling_AllowAndProperPostCondition) {
     Move move = Move({Color::BLACK, Piece::KING}, {E, 8}, {C, 8}, {MoveModifier::CASTLING_LONG});
 
     EXPECT_TRUE(debugWrappedApplyMove(board, move));
-    EXPECT_EQ((ChessPiece{Color::BLACK, Piece::KING}), board.getField({C, 8}).value());
-    EXPECT_EQ((ChessPiece{Color::BLACK, Piece::ROOK}), board.getField({D, 8}).value());
-    EXPECT_FALSE(board.getField({A, 8}).has_value());
-    EXPECT_FALSE(board.getField({E, 8}).has_value());
+    EXPECT_EQ((ChessPiece{Color::BLACK, Piece::KING}), board.getPieceOnField({C, 8}).value());
+    EXPECT_EQ((ChessPiece{Color::BLACK, Piece::ROOK}), board.getPieceOnField({D, 8}).value());
+    EXPECT_FALSE(board.getPieceOnField({A, 8}).has_value());
+    EXPECT_FALSE(board.getPieceOnField({E, 8}).has_value());
 }
 
 TEST(TestChessBoard, ApplyMove_BlackShortCastling_AllowAndProperPostCondition) {
@@ -244,10 +244,10 @@ TEST(TestChessBoard, ApplyMove_BlackShortCastling_AllowAndProperPostCondition) {
     Move move = Move({Color::BLACK, Piece::KING}, {E, 8}, {G, 8}, {MoveModifier::CASTLING_SHORT});
 
     EXPECT_TRUE(debugWrappedApplyMove(board, move));
-    EXPECT_EQ((ChessPiece{Color::BLACK, Piece::KING}), board.getField({G, 8}).value());
-    EXPECT_EQ((ChessPiece{Color::BLACK, Piece::ROOK}), board.getField({F, 8}).value());
-    EXPECT_FALSE(board.getField({H, 8}).has_value());
-    EXPECT_FALSE(board.getField({E, 8}).has_value());
+    EXPECT_EQ((ChessPiece{Color::BLACK, Piece::KING}), board.getPieceOnField({G, 8}).value());
+    EXPECT_EQ((ChessPiece{Color::BLACK, Piece::ROOK}), board.getPieceOnField({F, 8}).value());
+    EXPECT_FALSE(board.getPieceOnField({H, 8}).has_value());
+    EXPECT_FALSE(board.getPieceOnField({E, 8}).has_value());
 }
 
 TEST(TestBoardHelper, FieldToIndex_CornerFields_CorrectIndex) {

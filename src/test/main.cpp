@@ -6,11 +6,13 @@
 #include <stdexcept>
 #include <variant>
 
+#include "../bench.h"
 #include "gtest/gtest.h"
 
 using base::argparser;
 
 argparse_result CMD_OPTIONS;
+base::BenchmarkStatistics CHESS_BENCH;
 
 int main(int argc, char **argv) {
     ::testing::InitGoogleTest(&argc, argv);
