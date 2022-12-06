@@ -30,7 +30,10 @@ void ChessGame::startSyncronousGame(bool fullOutput) {
         assert(ChessRules::applyMove(_board, move));
     }
 
-    if (fullOutput) fmt::print("\n{:b}\n{}\n", _board, _board.getFENString(true));
+    if (fullOutput)
+        fmt::print("\n{:b}\n{}\n", _board, _board.getFENString(true));
+    else
+        fmt::print("{}\n", _board.getFENString(true));
 
     if (ChessRules::isCheckMate(_board)) {
         ChessPlayer& winner = *currentPlayer;

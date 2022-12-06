@@ -58,9 +58,7 @@ int main(int argc, char** argv) {
         PickRandomChessPlayer blackPlayer{"Upasna"};
         ChessGame game{whitePlayer, blackPlayer};
         game.startSyncronousGame();
-    }
-
-    if (options.get<int>("sim") > 0) {
+    } else if (options.get<int>("sim") > 0) {
         std::cout << "Simulate " << options.get<int>("sim") << " games\n";
         PickRandomChessPlayer whitePlayer{"Andreas"};
         PickRandomChessPlayer blackPlayer{"Upasna"};
