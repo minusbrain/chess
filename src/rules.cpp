@@ -176,6 +176,7 @@ bool ChessRules::isMoveLegal(const Board& board, const Move& potentialMove) {
 bool ChessRules::applyMove(Board& board, const Move& move) {
     auto cp = move.getChessPiece();
     Color movingColor = std::get<ColorIdx>(cp);
+    assert(movingColor == board.whosTurnIsIt());
     auto sf = move.getStartField();
     auto ef = move.getEndField();
     assert(BoardHelper::isInBounds(sf));
