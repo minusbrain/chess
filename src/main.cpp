@@ -54,8 +54,8 @@ int main(int argc, char** argv) {
     if (options.is_flag_set("fen")) parseFENsFromStdin(quiet);
 
     if (options.is_flag_set("game")) {
-        HumanChessPlayer whitePlayer{"Andreas"};
-        PickRandomChessPlayer blackPlayer{"Upasna"};
+        PickRandomChessPlayer whitePlayer{"Andreas"};
+        HumanChessPlayer blackPlayer{"Human"};
         ChessGame game{whitePlayer, blackPlayer};
         game.startSyncronousGame();
     } else if (options.get<int>("sim") > 0) {

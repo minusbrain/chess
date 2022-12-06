@@ -10,17 +10,32 @@ The project crates two binaries:
 * libchess library -> The engine
 * run_chess executable -> A simple executable that uses the library. See below for details of its function.
 
-Currently this only takes [FEN Strings](https://www.chess.com/terms/fen-chess#en-passant-targets) via stdin
+The current implementation offers three operation modes of the executable:
+
+## Analyye FEN Strings
+
+By using the '-f' option the executable reads in [FEN Strings](https://www.chess.com/terms/fen-chess#en-passant-targets) via stdin
 and prints the board in ASCII style and shows the valid moves for the color whos turn it is currently.
 
 Try it:
 ```bash
-echo "k1p5/8/P1r1p3/8/8/2P1R2p/8/K3P3 b - -" | ./run_chess
+echo "k1p5/8/P1r1p3/8/8/2P1R2p/8/K3P3 b - -" | ./run_chess -f
 ```
 
-You can use a FEN String generator like [this](http://www.netreal.de/Forsyth-Edwards-Notation/index.php) to
-generate the first part of the string. The other 3 parts are explained in the link above and have to be added
-manually.
+You could also use the include FEN String Generator to create a number of random FEN Strings and pass it directly to the executable:
+```bash
+./fen_gen.py 10 | run_chess -f
+```
+
+## Play a match against a really stupid KI
+
+By using the '-g' option the user can play a game against a very stupid computer that always picks a random available move.
+The board is printed and the user can select a move from a list of available moves. User-friendliness 0/10 :)
+
+## Simulate a number of matches between two stupid KIs
+
+By using the '-s 10' option 10 (or whatever number you pick) matches between two stupid KIs can be simulated and the result
+of each match is printed to the console.
 
 # How to build
 
@@ -55,10 +70,11 @@ This is work in progress
 * Promotion moves
 * Castling moves
 * Check / Check-Mate / Stale-Mate detection
+* Play a chess game in console. PvP or PvE or EvE
+* Simulate chess games between stupid KIs
 
 ## What the library can't do yet
 
-* Play a chess game (neither for humans or CPUs)
 * Support any kind of GUI
 * Manipulate a board via command line
 * Implement board -> possible moves -> check/check-mate/stale-mate information caching
