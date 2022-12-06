@@ -88,14 +88,37 @@ inline std::string optionalMoveSuffixes(Move move) {
  */
 template <>
 struct fmt::formatter<Move> {
-    constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
+    bool pgn = false;
+
+    constexpr auto parse(format_parse_context& ctx) {
+        auto it = ctx.begin(), end = ctx.end();
+        while (it != end && *it != '}') {
+            if (*it == 'p') {
+                pgn = true;
+                ++it;
+            }
+        }
+
+        // Check if reached the end of the range:
+        if (it != end && *it != '}') throw format_error("invalid format");
+
+        // Return an iterator past the end of the parsed range:
+        return it;
+    }
 
     template <typename FormatContext>
     auto format(const Move& move, FormatContext& ctx) {
+        using namespace std::string_literals;
         if (move.hasModifier(MoveModifier::CASTLING_SHORT)) {
-            return format_to(ctx.out(), "0-0");
+            if (pgn)
+                return format_to(ctx.out(), "O-O");
+            else
+                return format_to(ctx.out(), "0-0");
         } else if (move.hasModifier(MoveModifier::CASTLING_LONG)) {
-            return format_to(ctx.out(), "0-0-0");
+            if (pgn)
+                return format_to(ctx.out(), "O-O-O");
+            else
+                return format_to(ctx.out(), "0-0-0");
         } else {
             auto cp = move.getChessPiece();
             auto sf = move.getStartField();
@@ -106,11 +129,25 @@ struct fmt::formatter<Move> {
     }
 };
 
+inline int get_pgn_flag() {
+    static int i = std::ios_base::xalloc();
+    return i;
+}
+
+inline std::ostream& pgn_notation(std::ostream& os) {
+    os.iword(get_pgn_flag()) = 1;
+    return os;
+}
+inline std::ostream& san_notation(std::ostream& os) {
+    os.iword(get_pgn_flag()) = 0;
+    return os;
+}
+
 inline std::ostream& operator<<(std::ostream& os, const Move& move) {
     if (move.hasModifier(MoveModifier::CASTLING_SHORT)) {
-        os << "0-0";
+        os << (os.iword(get_pgn_flag()) == 0 ? "0-0" : "O-O");
     } else if (move.hasModifier(MoveModifier::CASTLING_LONG)) {
-        os << "0-0-0";
+        os << (os.iword(get_pgn_flag()) == 0 ? "0-0-0" : "O-O-O");
     } else {
         auto cp = move.getChessPiece();
         auto sf = move.getStartField();
