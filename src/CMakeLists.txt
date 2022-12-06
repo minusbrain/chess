@@ -3,6 +3,8 @@ set (SOURCE_CPP
    piece_rules.cpp
    move.cpp
    rules.cpp
+   chess_game.cpp
+   chess_player.cpp
    board_factory.cpp
 )
 

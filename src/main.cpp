@@ -7,6 +7,8 @@
 #include "board.h"
 #include "board_debug.h"
 #include "board_factory.h"
+#include "chess_game.h"
+#include "chess_player.h"
 #include "move.h"
 #include "move_debug.h"
 #include "rules.h"
@@ -16,15 +18,8 @@ using base::argparser;
 
 base::BenchmarkStatistics CHESS_BENCH;
 
-int main(int argc, char** argv) {
+void parseFENsFromStdin(bool quiet) {
     std::string fen;
-
-    argparser parser{"run_chess"};
-    parser.add_flag("quiet").short_option('q');
-
-    auto options = parser.parse(argc, argv);
-
-    bool quiet = options.is_flag_set("quiet");
 
     while (std::getline(std::cin, fen)) {
         Board board = BoardFactory::createBoardFromFEN(fen);
@@ -43,6 +38,37 @@ int main(int argc, char** argv) {
     }
 
     CHESS_BENCH.printStatistics();
+}
+
+int main(int argc, char** argv) {
+    argparser parser{"run_chess"};
+    parser.add_flag("quiet").short_option('q').description("Quiet, no output");
+    parser.add_flag("game").short_option('g').description("Play a game of chess");
+    parser.add_option<int>("sim").short_option('s').description("Simulate a number of automatic games").default_value(0);
+    parser.add_flag("fen").short_option('f').description("Parse FENs from stdin and print board plus possible moves.");
+
+    auto options = parser.parse(argc, argv);
+
+    bool quiet = options.is_flag_set("quiet");
+
+    if (options.is_flag_set("fen")) parseFENsFromStdin(quiet);
+
+    if (options.is_flag_set("game")) {
+        HumanChessPlayer whitePlayer{"Andreas"};
+        PickRandomChessPlayer blackPlayer{"Upasna"};
+        ChessGame game{whitePlayer, blackPlayer};
+        game.startSyncronousGame();
+    }
+
+    if (options.get<int>("sim") > 0) {
+        std::cout << "Simulate " << options.get<int>("sim") << " games\n";
+        PickRandomChessPlayer whitePlayer{"Andreas"};
+        PickRandomChessPlayer blackPlayer{"Upasna"};
+        for (int i = options.get<int>("sim"); i > 0; --i) {
+            ChessGame game{whitePlayer, blackPlayer};
+            game.startSyncronousGame(false);
+        }
+    }
 
     return 0;
 }
