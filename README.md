@@ -12,14 +12,14 @@ The project crates two binaries:
 
 The current implementation offers three operation modes of the executable:
 
-## Analyye FEN Strings
+## Analyze FEN Strings
 
 By using the '-f' option the executable reads in [FEN Strings](https://www.chess.com/terms/fen-chess#en-passant-targets) via stdin
 and prints the board in ASCII style and shows the valid moves for the color whos turn it is currently.
 
 Try it:
 ```bash
-echo "k1p5/8/P1r1p3/8/8/2P1R2p/8/K3P3 b - -" | ./run_chess -f
+echo "k1p5/8/P1r1p3/8/8/2P1R2p/8/K3P3 b - -" | run_chess -f
 ```
 
 You could also use the include FEN String Generator to create a number of random FEN Strings and pass it directly to the executable:
