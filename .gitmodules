@@ -4,3 +4,6 @@
 [submodule "ext/aelib"]
 	path = ext/aelib
 	url = git@github.com:minusbrain/aelib.git
+[submodule "ext/cmake"]
+	path = ext/cmake
+	url = https://github.com/bilke/cmake-modules.git
