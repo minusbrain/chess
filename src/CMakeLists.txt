@@ -1,6 +1,7 @@
 set (SOURCE_CPP
    board.cpp
    piece_rules.cpp
+   game.cpp
    move.cpp
    rules.cpp
    chess_game.cpp

@@ -24,8 +24,8 @@ Board::Board()
 std::string getStringFromChessField(const ChessField& cf) {
     std::stringstream ss;
 
-    ss << std::get<ChessFileIdx>(cf) - (char)1 + 'a';
-    ss << std::get<ChessRankIdx>(cf) + '0';
+    ss << (char)(std::get<ChessFileIdx>(cf) - (char)1 + 'a');
+    ss << (char)(std::get<ChessRankIdx>(cf) + '0');
 
     return ss.str();
 }

@@ -122,7 +122,7 @@ TEST(TestChessBoard, ApplyMove_EnPassantButWrongdistance_DisallowAndNothingChang
 }
 
 TEST(TestChessBoard, ApplyMove_EnPassantButWrongPiece_DisallowAndNothingChanged) {
-    auto board = debugWrappedGetBoardFromFEN("rnbqkbnr/1ppppppp/8/pN6/8/8/PPPPPPPP/R1BQKBNR b KQkq a6");
+    auto board = debugWrappedGetBoardFromFEN("rnbqkbnr/1ppppppp/8/pN6/8/8/PPPPPPPP/R1BQKBNR w KQkq a6");
     Board preBoard(board);
     Move move = Move({Color::WHITE, Piece::PAWN}, {B, 5}, {A, 6}, {MoveModifier::CAPTURE, MoveModifier::EN_PASSANT});
 
@@ -229,7 +229,7 @@ TEST(TestChessBoard, ApplyMove_WhiteShortCastling_AllowAndProperPostCondition) {
 }
 
 TEST(TestChessBoard, ApplyMove_BlackLongCastling_AllowAndProperPostCondition) {
-    auto board = debugWrappedGetBoardFromFEN("r3k2r/8/8/8/8/8/8/R3K2R w QqKk -");
+    auto board = debugWrappedGetBoardFromFEN("r3k2r/8/8/8/8/8/8/R3K2R b QqKk -");
     Move move = Move({Color::BLACK, Piece::KING}, {E, 8}, {C, 8}, {MoveModifier::CASTLING_LONG});
 
     EXPECT_TRUE(debugWrappedApplyMove(board, move));
@@ -240,7 +240,7 @@ TEST(TestChessBoard, ApplyMove_BlackLongCastling_AllowAndProperPostCondition) {
 }
 
 TEST(TestChessBoard, ApplyMove_BlackShortCastling_AllowAndProperPostCondition) {
-    auto board = debugWrappedGetBoardFromFEN("r3k2r/8/8/8/8/8/8/R3K2R w QqKk -");
+    auto board = debugWrappedGetBoardFromFEN("r3k2r/8/8/8/8/8/8/R3K2R b QqKk -");
     Move move = Move({Color::BLACK, Piece::KING}, {E, 8}, {G, 8}, {MoveModifier::CASTLING_SHORT});
 
     EXPECT_TRUE(debugWrappedApplyMove(board, move));
@@ -273,5 +273,13 @@ TEST(TestChessBoard, FenStringLoop_1) {
 TEST(TestChessBoard, FenStringStartBoard) {
     std::string expected = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w QKqk -";
     Board board = debugWrappedGetStdBoard();
+    EXPECT_EQ(expected, board.getFENString());
+}
+
+TEST(TestChessBoard, FenStringWithEnPassantTarget) {
+    std::string expected = "1r2kb2/5pn1/2n1p1Bp/ppPpq3/7P/1PPPP1PR/1B3P2/1RK3N1 w k b6";
+    auto board = debugWrappedGetBoardFromFEN("1r2kb2/1p3pn1/2n1p1Bp/p1Ppq3/7P/1PPPP1PR/1B3P2/1RK3N1 b k - -");
+    Move move{{Color::BLACK, Piece::PAWN}, {B, 7}, {B, 5}, {}};
+    EXPECT_TRUE(debugWrappedApplyMove(board, move));
     EXPECT_EQ(expected, board.getFENString());
 }

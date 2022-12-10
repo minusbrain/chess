@@ -40,5 +40,5 @@ class ChessRules {
      * @param move  The move to execute
      * @return bool - Was the move executed?
      */
-    static bool applyMove(Board& board, const Move& move);
+    static bool applyMove(Board& board, const Move& move, bool assertLegal = false);
 };

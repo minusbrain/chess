@@ -270,3 +270,16 @@ TEST(TestChessRules, RandomFen_CausedCoreDump_GithubIssue_1) {
     auto board = debugWrappedGetBoardFromFEN("4N3/N1N3n1/8/N5K1/7R/PR3Bk1/8/6Q1 w - -");
     EXPECT_NO_FATAL_FAILURE(auto moves = debugWrappedGetAllValidMoves(board));
 }
+
+TEST(TestChessRules, ApplyMove_Castling_Regression) {
+    auto board = debugWrappedGetBoardFromFEN("3nk3/5p2/1r2pb1p/1PPB3n/3pP2P/1p2P1P1/3RNP1R/B3K3 b k - -");
+    EXPECT_FALSE(board.isLegalPosition());
+}
+
+TEST(TestChessRules, GetAllValidMoves_CastlingAvailable_ButPiecesInBetween) {
+    auto board = debugWrappedGetStdBoard();
+    auto moves = debugWrappedGetAllValidMoves(board);
+
+    EXPECT_DOESNOT_CONTAIN(Move{{Color::WHITE, Piece::KING}, {E, 1}, {G, 1}, {MoveModifier::CASTLING_SHORT}}, moves);
+    EXPECT_DOESNOT_CONTAIN(Move{{Color::WHITE, Piece::KING}, {E, 1}, {C, 1}, {MoveModifier::CASTLING_LONG}}, moves);
+}

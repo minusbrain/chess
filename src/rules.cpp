@@ -173,7 +173,7 @@ bool ChessRules::isMoveLegal(const Board& board, const Move& potentialMove) {
     return !wouldMoveSelfIntoCheck(board, potentialMove);
 }
 
-bool ChessRules::applyMove(Board& board, const Move& move) {
+bool ChessRules::applyMove(Board& board, const Move& move, bool assertLegal) {
     auto cp = move.getChessPiece();
     Color movingColor = std::get<ColorIdx>(cp);
     assert(movingColor == board.whosTurnIsIt());
@@ -186,6 +186,11 @@ bool ChessRules::applyMove(Board& board, const Move& move) {
     auto endPiece = board.getPieceOnField(ef);
 
     bool pawnOrCaptureMove = false;
+
+    if (assertLegal && board.isLegalPosition() == false) {
+        fmt::print("Input of applyMove() illegal: {} Move: {}\n", board.getFENString(), move);
+        assert(false);
+    }
 
     if (!startPiece.has_value() || startPiece.value() != cp) {
         return false;
@@ -282,6 +287,15 @@ bool ChessRules::applyMove(Board& board, const Move& move) {
 
     if (move.hasModifier(MoveModifier::CAPTURE)) {
         pawnOrCaptureMove = true;
+        if (ef == ChessField{A, 1}) {
+            board.unsetCastling(Board::Castling::WHITE_LONG);
+        } else if (ef == ChessField{H, 1}) {
+            board.unsetCastling(Board::Castling::WHITE_SHORT);
+        } else if (ef == ChessField{A, 8}) {
+            board.unsetCastling(Board::Castling::BLACK_LONG);
+        } else if (ef == ChessField{H, 8}) {
+            board.unsetCastling(Board::Castling::BLACK_SHORT);
+        }
     }
 
     if (piece == Piece::PAWN) {
@@ -318,6 +332,11 @@ bool ChessRules::applyMove(Board& board, const Move& move) {
         board.resetHalfMoveClock();
     } else {
         board.incrementHalfMoveClock();
+    }
+
+    if (assertLegal && board.isLegalPosition() == false) {
+        fmt::print("Output of applyMove() illegal: {} Move: {}\n", board.getFENString(), move);
+        assert(false);
     }
 
     return true;

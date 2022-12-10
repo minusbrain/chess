@@ -42,13 +42,19 @@ void parseFENsFromStdin(bool quiet) {
 
 int main(int argc, char** argv) {
     argparser parser{"run_chess"};
+
     parser.add_flag("quiet").short_option('q').description("Quiet, no output");
+    parser.add_flag("help").short_option('h').description("Print help");
     parser.add_flag("game").short_option('g').description("Play a game of chess");
     parser.add_option<int>("sim").short_option('s').description("Simulate a number of automatic games").default_value(0);
     parser.add_flag("fen").short_option('f').description("Parse FENs from stdin and print board plus possible moves.");
 
     auto options = parser.parse(argc, argv);
 
+    if (options.is_flag_set("help")) {
+        parser.print_help(std::cout);
+        return 0;
+    }
     bool quiet = options.is_flag_set("quiet");
 
     if (options.is_flag_set("fen")) parseFENsFromStdin(quiet);

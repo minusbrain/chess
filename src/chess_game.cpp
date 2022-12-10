@@ -1,6 +1,8 @@
 #include "chess_game.h"
 
 #include <iostream>
+#include <memory>
+#include <optional>
 #include <vector>
 
 #include "board_debug.h"
@@ -10,12 +12,14 @@
 #include "rules.h"
 #include "types.h"
 
-ChessGame::ChessGame(ChessPlayer& white, ChessPlayer& black) : _board(BoardFactory::createStandardBoard()), _white(white), _black(black) {}
+ChessGame::ChessGame(ChessPlayer& white, ChessPlayer& black)
+    : _board(BoardFactory::createStandardBoard()), _white(white), _black(black), _progress(_board, {}) {}
 
 bool isGameOver(Board& board) { return ChessRules::isCheckMate(board) || ChessRules::isStaleMate(board) || board.getHalfMoveClock() > 50; }
 
 void ChessGame::startSyncronousGame(bool fullOutput) {
     ChessPlayer* currentPlayer = &_white;
+
     if (fullOutput) fmt::print("ChessGame between {} (white) and {} (black)\n", _white.getName(), _black.getName());
     while (!isGameOver(_board)) {
         currentPlayer = (_board.whosTurnIsIt() == Color::WHITE ? &_white : &_black);
@@ -27,7 +31,9 @@ void ChessGame::startSyncronousGame(bool fullOutput) {
         const Move& move = currentPlayer->getMove(_board, validMoves);
         if (fullOutput) fmt::print("{} plays {}\n", currentPlayer->getName(), move);
 
-        assert(ChessRules::applyMove(_board, move));
+        // fmt::print("{} - {}\n", _board.getFENString(), move);
+        assert(ChessRules::applyMove(_board, move, true));
+        _progress.addMove(move, _board, {});
     }
 
     if (fullOutput)
