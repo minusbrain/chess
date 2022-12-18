@@ -51,6 +51,8 @@ int main(int argc, char** argv) {
 
     auto options = parser.parse(argc, argv);
 
+    std::cout << options;
+
     if (options.is_flag_set("help")) {
         parser.print_help(std::cout);
         return 0;
@@ -60,7 +62,7 @@ int main(int argc, char** argv) {
     if (options.is_flag_set("fen")) parseFENsFromStdin(quiet);
 
     if (options.is_flag_set("game")) {
-        PickRandomChessPlayer whitePlayer{"Andreas"};
+        OneMoveDeepBestPositionChessPlayer whitePlayer{"Andreas"};
         HumanChessPlayer blackPlayer{"Human"};
         ChessGame game{whitePlayer, blackPlayer};
         game.startSyncronousGame();
