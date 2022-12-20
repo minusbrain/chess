@@ -23,17 +23,15 @@ void parseFENsFromStdin(bool quiet) {
 
     while (std::getline(std::cin, fen)) {
         Board board = BoardFactory::createBoardFromFEN(fen);
-        if (!quiet) std::cout << "FEN String " << fen << board;
+        if (!quiet) fmt::print("FEN String {}\n{}", fen, board);
 
         bool legalPosition = board.isLegalPosition();
 
-        if (!quiet) std::cout << "Board position is " << (legalPosition ? "legal" : "illegal") << "\n";
+        if (!quiet) fmt::print("Board position is {}\n", (legalPosition ? "legal" : "illegal"));
 
         if (legalPosition) {
             auto validMoves = ChessRules::getAllValidMoves(board);
-
-            if (!quiet)
-                std::cout << "Valid moves for " << (board.whosTurnIsIt() == Color::WHITE ? "white" : "black") << ": " << validMoves << "\n";
+            if (!quiet) fmt::print("Valid moves for  {}: {}", (board.whosTurnIsIt() == Color::WHITE ? "white" : "black"), validMoves);
         }
     }
 
@@ -51,8 +49,6 @@ int main(int argc, char** argv) {
 
     auto options = parser.parse(argc, argv);
 
-    std::cout << options;
-
     if (options.is_flag_set("help")) {
         parser.print_help(std::cout);
         return 0;
@@ -67,12 +63,12 @@ int main(int argc, char** argv) {
         ChessGame game{whitePlayer, blackPlayer};
         game.startSyncronousGame();
     } else if (options.get<int>("sim") > 0) {
-        std::cout << "Simulate " << options.get<int>("sim") << " games\n";
+        fmt::print("Simulate {} games\n", options.get<int>("sim"));
         PickRandomChessPlayer whitePlayer{"Andreas"};
         PickRandomChessPlayer blackPlayer{"Upasna"};
         for (int i = options.get<int>("sim"); i > 0; --i) {
             ChessGame game{whitePlayer, blackPlayer};
-            game.startSyncronousGame(false);
+            game.startSyncronousGame();
         }
     }
 
