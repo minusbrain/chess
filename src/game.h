@@ -16,10 +16,30 @@ struct GameState {
 };
 
 template <class TGameState, class TMove, class TExtraData>
+class GameStateIterator {
+   public:
+    using State = GameState<TGameState, TMove, TExtraData>;
+    GameStateIterator(std::shared_ptr<State> curr) : _curr(curr) {}
+
+    bool operator!=(const GameStateIterator& other) const { return !operator==(other); }
+    bool operator==(const GameStateIterator& other) const { return _curr == other._curr; }
+    GameStateIterator& operator++() {
+        if (_curr != nullptr) _curr = _curr->next;
+        return *this;
+    }
+
+    std::shared_ptr<State> operator*() { return _curr; }
+
+   private:
+    std::shared_ptr<State> _curr;
+};
+
+template <class TGameState, class TMove, class TExtraData>
 class Game : public base::NONCOPYANDMOVEABLE {
    public:
     using MyType = Game<TGameState, TMove, TExtraData>;
     using State = GameState<TGameState, TMove, TExtraData>;
+    using Iterator = GameStateIterator<TGameState, TMove, TExtraData>;
 
     Game() = delete;
     Game(const TGameState& rootState, const TExtraData& extraData) : _root(std::make_shared<State>()), _last(_root) {
@@ -37,6 +57,9 @@ class Game : public base::NONCOPYANDMOVEABLE {
         oldLast->moveToNext = std::make_shared<TMove>(move);
     }
     std::shared_ptr<State> getCurrentState() { return _last; }
+
+    const Iterator begin() { return Iterator{_root}; }
+    const Iterator end() { return Iterator{nullptr}; }
 
    private:
     std::shared_ptr<State> _root = nullptr;

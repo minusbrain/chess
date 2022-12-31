@@ -7,6 +7,7 @@ set (SOURCE_CPP
    chess_game.cpp
    chess_player.cpp
    board_factory.cpp
+   ai_helper.cpp
 )
 
 add_library(chess ${SOURCE_CPP})

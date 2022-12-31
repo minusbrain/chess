@@ -1,6 +1,7 @@
 #pragma once
 #include <fmt/core.h>
 #include <fmt/format.h>
+#include <fmt/ranges.h>
 
 #include <cctype>
 #include <iterator>
@@ -107,7 +108,7 @@ struct fmt::formatter<Move> {
     }
 
     template <typename FormatContext>
-    auto format(const Move& move, FormatContext& ctx) {
+    auto format(const Move& move, FormatContext& ctx) const {
         using namespace std::string_literals;
         if (move.hasModifier(MoveModifier::CASTLING_SHORT)) {
             if (pgn)
@@ -128,32 +129,3 @@ struct fmt::formatter<Move> {
         }
     }
 };
-
-inline int get_pgn_flag() {
-    static int i = std::ios_base::xalloc();
-    return i;
-}
-
-inline std::ostream& pgn_notation(std::ostream& os) {
-    os.iword(get_pgn_flag()) = 1;
-    return os;
-}
-inline std::ostream& san_notation(std::ostream& os) {
-    os.iword(get_pgn_flag()) = 0;
-    return os;
-}
-
-inline std::ostream& operator<<(std::ostream& os, const Move& move) {
-    if (move.hasModifier(MoveModifier::CASTLING_SHORT)) {
-        os << (os.iword(get_pgn_flag()) == 0 ? "0-0" : "O-O");
-    } else if (move.hasModifier(MoveModifier::CASTLING_LONG)) {
-        os << (os.iword(get_pgn_flag()) == 0 ? "0-0-0" : "O-O-O");
-    } else {
-        auto cp = move.getChessPiece();
-        auto sf = move.getStartField();
-        auto ef = move.getEndField();
-        os << chessPieceToLAN(cp) << chessFieldToLAN(sf) << optionalCaptureIndicator(move) << chessFieldToLAN(ef)
-           << optionalMoveSuffixes(move);
-    }
-    return os;
-}

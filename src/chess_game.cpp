@@ -35,12 +35,23 @@ void ChessGame::startSyncronousGame(bool fullOutput) {
         _progress.addMove(move, _board, {});
     }
 
-    fmt::print("{}", _board);
+    if (fullOutput) {
+        int stateCtr = 0;
+        for (auto state : _progress) {
+            if (state == nullptr) {
+                fmt::print("Should NOT have happen!");
+                break;
+            }
+            if (state->moveToNext == nullptr) break;
+            if (stateCtr % 10 == 0) fmt::print("\n");
+            if (stateCtr % 2 == 0) fmt::print("{}. ", (stateCtr / 2) + 1);
+            fmt::print("{} ", *(state->moveToNext));
+            ++stateCtr;
+        }
+        fmt::print("\n");
+    }
 
-    if (fullOutput)
-        fmt::print("\n{:b}\n{}\n", _board, _board.getFENString(true));
-    else
-        fmt::print("{}\n", _board.getFENString(true));
+    fmt::print("{}\n", _board.getFENString(true));
 
     if (ChessRules::isCheckMate(_board)) {
         ChessPlayer& winner = *currentPlayer;

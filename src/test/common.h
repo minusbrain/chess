@@ -11,13 +11,12 @@ class Move;
 
 template <class T, class C>
 void EXPECT_CONTAINS(T item, C container) {
-    EXPECT_NE(container.end(), std::find(container.begin(), container.end(), item))
-        << "Container " << container << " does not contain " << item;
+    EXPECT_NE(container.end(), std::find(container.begin(), container.end(), item));
 }
 
 template <class T, class C>
 void EXPECT_DOESNOT_CONTAIN(T item, C container) {
-    EXPECT_EQ(container.end(), std::find(container.begin(), container.end(), item)) << "Container " << container << " contains " << item;
+    EXPECT_EQ(container.end(), std::find(container.begin(), container.end(), item));
 }
 
 int getNumberOfMovesForPiece(std::vector<Move> moves, ChessPiece piece);

@@ -95,19 +95,15 @@ std::vector<Move> ChessRules::getAllValidMoves(const Board& board, bool annotate
 
 void ChessRules::annotateMoves(const Board& board, std::vector<Move>& moves) {
     for (auto& move : moves) {
-        // std::cout << "\nApplying " << move << " to " << board << std::flush;
         Board resultingBoard(board);
         applyMove(resultingBoard, move);
         bool check = isCheck(resultingBoard);
 
         if (isCheckMate(resultingBoard, check)) {
-            // std::cout << "\nMove " << move << " is check mate!" << std::flush;
             move.addModifier(MoveModifier::CHECK_MATE);
         } else if (isStaleMate(resultingBoard, check)) {
-            // std::cout << "\nMove " << move << " is stale mate!" << std::flush;
             move.addModifier(MoveModifier::STALE_MATE);
         } else if (check) {
-            // std::cout << "\nMove " << move << " is check!" << std::flush;
             move.addModifier(MoveModifier::CHECK);
         }
     }

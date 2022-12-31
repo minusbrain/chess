@@ -1,13 +1,16 @@
 #include "chess_player.h"
 
+#include <algorithm>
 #include <cassert>
 #include <iostream>
 #include <iterator>
 #include <random>
 
+#include "ai_helper.h"
 #include "base/helpers.h"
 #include "fmt/core.h"
 #include "move_debug.h"
+#include "rules.h"
 
 template <typename Iter, typename RandomGenerator>
 Iter select_randomly(Iter start, Iter end, RandomGenerator& g) {
@@ -30,21 +33,39 @@ const std::string& ChessPlayer::getName() const { return _name; }
 
 PickFirstChessPlayer::PickFirstChessPlayer(const std::string& name) : ChessPlayer(name) {}
 
-const Move& PickFirstChessPlayer::getMove(const Board&, const std::vector<Move>& potentialMoves) {
+Move PickFirstChessPlayer::getMove(const Board&, const std::vector<Move>& potentialMoves) {
     assert(potentialMoves.size() > 0);
     return potentialMoves[0];
 }
 
 PickRandomChessPlayer::PickRandomChessPlayer(const std::string& name) : ChessPlayer(name) {}
 
-const Move& PickRandomChessPlayer::getMove(const Board&, const std::vector<Move>& potentialMoves) {
+Move PickRandomChessPlayer::getMove(const Board&, const std::vector<Move>& potentialMoves) {
     assert(potentialMoves.size() > 0);
     return *select_randomly(potentialMoves.begin(), potentialMoves.end());
 }
 
+OneMoveDeepBestPositionChessPlayer::OneMoveDeepBestPositionChessPlayer(const std::string& name) : ChessPlayer(name) {}
+
+Move OneMoveDeepBestPositionChessPlayer::getMove(const Board& board, const std::vector<Move>& potentialMoves) {
+    assert(potentialMoves.size() > 0);
+    std::vector<int32_t> ratingsInMyFavor;
+    Color myColor = board.whosTurnIsIt();
+
+    for (const Move& move : potentialMoves) {
+        Board resultingBoard(board);
+        ChessRules::applyMove(resultingBoard, move);
+        auto rating = getPositionRating(resultingBoard);
+        ratingsInMyFavor.push_back(myColor == Color::WHITE ? rating.white_pieces - rating.black_pieces
+                                                           : rating.black_pieces - rating.white_pieces);
+    }
+    auto maxIt = std::max_element(ratingsInMyFavor.begin(), ratingsInMyFavor.end());
+    return potentialMoves[std::distance(ratingsInMyFavor.begin(), maxIt)];
+}
+
 HumanChessPlayer::HumanChessPlayer(const std::string& name) : ChessPlayer(name) {}
 
-const Move& HumanChessPlayer::getMove(const Board&, const std::vector<Move>& potentialMoves) {
+Move HumanChessPlayer::getMove(const Board&, const std::vector<Move>& potentialMoves) {
     assert(potentialMoves.size() > 0);
     int i = 0;
     for (auto& move : potentialMoves) {

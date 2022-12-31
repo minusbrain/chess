@@ -101,25 +101,3 @@ struct fmt::formatter<Board> {
         return it;
     }
 };
-
-inline std::ostream &operator<<(std::ostream &os, const ChessPiece p) {
-    os << getDebugCharForPiece(p);
-    return os;
-}
-
-inline std::ostream &operator<<(std::ostream &os, const Board &board) {
-    os << "\n abcdefgh\n";
-    for (int row = 8; row > 0; --row) {
-        os << row;
-        for (int line = A; line <= H; ++line) {
-            auto cp = board.getPieceOnField(line, row);
-            if (cp.has_value())
-                os << cp.value();
-            else
-                os << " ";
-        }
-        os << row << "\n";
-    }
-    os << " abcdefgh\n";
-    return os;
-}

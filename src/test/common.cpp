@@ -5,6 +5,7 @@
 #include "../board.h"
 #include "../board_factory.h"
 #include "../move.h"
+#include "../move_debug.h"
 #include "../rules.h"
 #include "main.h"
 
@@ -15,7 +16,7 @@ int getNumberOfMovesForPiece(std::vector<Move> moves, ChessPiece piece) {
 Board debugWrappedGetBoardFromFEN(std::string fen) {
     Board board = BoardFactory::createBoardFromFEN(fen);
     if (CMD_OPTIONS.is_flag_set("debug")) {
-        std::cout << "Using board with FEN " << fen << " :" << board << std::flush;
+        fmt::print("Using board with FEN {} : {}", fen, board);
     }
     return board;
 }
@@ -23,7 +24,7 @@ Board debugWrappedGetBoardFromFEN(std::string fen) {
 Board debugWrappedGetStdBoard() {
     Board board = BoardFactory::createStandardBoard();
     if (CMD_OPTIONS.is_flag_set("debug")) {
-        std::cout << "Using standard board " << board << std::flush;
+        fmt::print("Using standard board {}", board);
     }
     return board;
 }
@@ -31,7 +32,7 @@ Board debugWrappedGetStdBoard() {
 std::vector<Move> debugWrappedGetAllValidMoves(const Board& board) {
     auto moves = ChessRules::getAllValidMoves(board);
     if (CMD_OPTIONS.is_flag_set("debug")) {
-        std::cout << "Found the following " << moves.size() << " valid moves: " << moves << "\n" << std::flush;
+        fmt::print("Found the following {} valid moves: {}", moves.size(), moves);
     }
     return moves;
 }
@@ -39,7 +40,7 @@ std::vector<Move> debugWrappedGetAllValidMoves(const Board& board) {
 bool debugWrappedApplyMove(Board& board, const Move& move) {
     bool ret = ChessRules::applyMove(board, move);
     if (CMD_OPTIONS.is_flag_set("debug")) {
-        std::cout << "Applying move " << move << "\nResulting board" << board << std::flush;
+        fmt::print("Applying move {}\nResulting board {}", move, board);
     }
     return ret;
 }
