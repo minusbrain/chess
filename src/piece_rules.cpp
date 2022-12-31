@@ -241,11 +241,9 @@ char RookRules::getDebugChar(Color color) { return color == Color::WHITE ? 'R' :
 std::vector<Move> QueenRules::getPotentialMoves(const Board& board, ChessPieceOnField pieceOnField) {
     std::vector<Move> potentialMoves;
     potentialMoves.reserve(28);
-    RookRules rook;
-    BishopRules bishop;
 
-    base::push_back(potentialMoves, rook.getPotentialMoves(board, pieceOnField));
-    base::push_back(potentialMoves, bishop.getPotentialMoves(board, pieceOnField));
+    base::push_back(potentialMoves, RookRules::getPotentialMoves(board, pieceOnField));
+    base::push_back(potentialMoves, BishopRules::getPotentialMoves(board, pieceOnField));
 
     return potentialMoves;
 }

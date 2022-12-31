@@ -1,5 +1,3 @@
-#include "chess_game.h"
-
 #include <iostream>
 #include <memory>
 #include <optional>
@@ -7,6 +5,7 @@
 
 #include "board_debug.h"
 #include "board_factory.h"
+#include "chess_game.h"
 #include "fmt/core.h"
 #include "move_debug.h"
 #include "rules.h"
@@ -35,6 +34,8 @@ void ChessGame::startSyncronousGame(bool fullOutput) {
         assert(ChessRules::applyMove(_board, move, true));
         _progress.addMove(move, _board, {});
     }
+
+    fmt::print("{}", _board);
 
     if (fullOutput)
         fmt::print("\n{:b}\n{}\n", _board, _board.getFENString(true));

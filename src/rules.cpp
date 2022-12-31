@@ -15,12 +15,13 @@
 #include "piece_rules.h"
 #include "types.h"
 
-static std::map<Piece, ChessPieceRules*> pieceRules = {{Piece::PAWN, new PawnRules()},     {Piece::BISHOP, new BishopRules()},
-                                                       {Piece::KNIGHT, new KnightRules()}, {Piece::ROOK, new RookRules()},
-                                                       {Piece::QUEEN, new QueenRules()},   {Piece::KING, new KingRules()},
-                                                       {Piece::DECOY, new DecoyRules()}};
+static std::map<Piece, std::function<std::vector<Move>(const Board& board, ChessPieceOnField pieceOnField)>> pieceRules = {
+    {Piece::PAWN, PawnRules::getPotentialMoves},     {Piece::BISHOP, BishopRules::getPotentialMoves},
+    {Piece::KNIGHT, KnightRules::getPotentialMoves}, {Piece::ROOK, RookRules::getPotentialMoves},
+    {Piece::QUEEN, QueenRules::getPotentialMoves},   {Piece::KING, KingRules::getPotentialMoves},
+    {Piece::DECOY, DecoyRules::getPotentialMoves}};
 
-Color getOppositeColor(Color color) { return (color == Color::WHITE ? Color::BLACK : Color::WHITE); }
+inline constexpr Color getOppositeColor(Color color) { return (color == Color::WHITE ? Color::BLACK : Color::WHITE); }
 
 bool ChessRules::isCheck(const Board& board) {
     std::optional<ChessField> kingFieldOpt = board.findFirstPiece([&board](ChessPiece cp) {
@@ -130,29 +131,19 @@ std::vector<Move> ChessRules::getPotentialMoves(const Board& board, ChessPieceOn
     ChessPiece cp = std::get<ChessPieceIdx>(pieceOnField);
     Piece piece = std::get<PieceIdx>(cp);
 
-    return pieceRules[piece]->getPotentialMoves(board, pieceOnField);
+    return pieceRules[piece](board, pieceOnField);
 }
 
 bool ChessRules::isCastlingLegal(const Board& board, const Move& potentialMove) {
-    // Todo. Fix / Implement by using      numOfPotentialMovesCoveringField(const Board &board, ChessField field)
     Color movingColor = std::get<ColorIdx>(potentialMove.getChessPiece());
     ChessRank castlingRank = (movingColor == Color::WHITE ? 1 : 8);
 
     if (potentialMove.hasModifier(MoveModifier::CASTLING_LONG)) {
-        if (board.getPieceOnField({B, castlingRank}).has_value() || board.getPieceOnField({C, castlingRank}).has_value() ||
-            board.getPieceOnField({D, castlingRank}).has_value()) {
-            return false;
-        }
         return !isFieldCoveredByColor(board, ChessField{D, castlingRank}, getOppositeColor(movingColor));
 
     } else if (potentialMove.hasModifier(MoveModifier::CASTLING_SHORT)) {
-        if (board.getPieceOnField({F, castlingRank}).has_value() || board.getPieceOnField({G, castlingRank}).has_value()) {
-            return false;
-        }
         return !isFieldCoveredByColor(board, ChessField{F, castlingRank}, getOppositeColor(movingColor));
     }
-
-    // If the final position of the king is covered is checked on higher level, so we do not check it here again.
 
     return true;
 }

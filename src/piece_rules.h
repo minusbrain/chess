@@ -7,75 +7,44 @@
 class Board;
 class Move;
 
-class ChessPieceRules {
+class PawnRules {
    public:
-    ChessPieceRules(){};
-    virtual ~ChessPieceRules(){};
-
-    virtual std::vector<Move> getPotentialMoves(const Board& board, ChessPieceOnField pieceOnField) = 0;
-    virtual char getDebugChar(Color color) = 0;
-    char getDebugChar() { return getDebugChar(Color::WHITE); };
+    static std::vector<Move> getPotentialMoves(const Board& board, ChessPieceOnField pieceOnField);
+    static char getDebugChar(Color color);
 };
 
-class PawnRules : public ChessPieceRules {
+class BishopRules {
    public:
-    PawnRules(){};
-    virtual ~PawnRules(){};
-
-    virtual std::vector<Move> getPotentialMoves(const Board& board, ChessPieceOnField pieceOnField);
-    virtual char getDebugChar(Color color);
+    static std::vector<Move> getPotentialMoves(const Board& board, ChessPieceOnField pieceOnField);
+    static char getDebugChar(Color color);
 };
 
-class BishopRules : public ChessPieceRules {
+class KnightRules {
    public:
-    BishopRules(){};
-    virtual ~BishopRules(){};
-
-    virtual std::vector<Move> getPotentialMoves(const Board& board, ChessPieceOnField pieceOnField);
-    virtual char getDebugChar(Color color);
+    static std::vector<Move> getPotentialMoves(const Board& board, ChessPieceOnField pieceOnField);
+    static char getDebugChar(Color color);
 };
 
-class KnightRules : public ChessPieceRules {
+class RookRules {
    public:
-    KnightRules(){};
-    virtual ~KnightRules(){};
-
-    virtual std::vector<Move> getPotentialMoves(const Board& board, ChessPieceOnField pieceOnField);
-    virtual char getDebugChar(Color color);
+    static std::vector<Move> getPotentialMoves(const Board& board, ChessPieceOnField pieceOnField);
+    static char getDebugChar(Color color);
 };
 
-class RookRules : public ChessPieceRules {
+class QueenRules {
    public:
-    RookRules(){};
-    virtual ~RookRules(){};
-
-    virtual std::vector<Move> getPotentialMoves(const Board& board, ChessPieceOnField pieceOnField);
-    virtual char getDebugChar(Color color);
+    static std::vector<Move> getPotentialMoves(const Board& board, ChessPieceOnField pieceOnField);
+    static char getDebugChar(Color color);
 };
 
-class QueenRules : public ChessPieceRules {
+class KingRules {
    public:
-    QueenRules(){};
-    virtual ~QueenRules(){};
-
-    virtual std::vector<Move> getPotentialMoves(const Board& board, ChessPieceOnField pieceOnField);
-    virtual char getDebugChar(Color color);
+    static std::vector<Move> getPotentialMoves(const Board& board, ChessPieceOnField pieceOnField);
+    static char getDebugChar(Color color);
 };
 
-class KingRules : public ChessPieceRules {
+class DecoyRules {
    public:
-    KingRules(){};
-    virtual ~KingRules(){};
-
-    virtual std::vector<Move> getPotentialMoves(const Board& board, ChessPieceOnField pieceOnField);
-    virtual char getDebugChar(Color color);
-};
-
-class DecoyRules : public ChessPieceRules {
-   public:
-    DecoyRules(){};
-    virtual ~DecoyRules(){};
-
-    virtual std::vector<Move> getPotentialMoves(const Board& board, ChessPieceOnField pieceOnField);
-    virtual char getDebugChar(Color color);
+    static std::vector<Move> getPotentialMoves(const Board& board, ChessPieceOnField pieceOnField);
+    static char getDebugChar(Color color);
 };
