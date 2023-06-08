@@ -112,20 +112,20 @@ struct fmt::formatter<Move> {
         using namespace std::string_literals;
         if (move.hasModifier(MoveModifier::CASTLING_SHORT)) {
             if (pgn)
-                return format_to(ctx.out(), "O-O");
+                return fmt::format_to(ctx.out(), "O-O");
             else
-                return format_to(ctx.out(), "0-0");
+                return fmt::format_to(ctx.out(), "0-0");
         } else if (move.hasModifier(MoveModifier::CASTLING_LONG)) {
             if (pgn)
-                return format_to(ctx.out(), "O-O-O");
+                return fmt::format_to(ctx.out(), "O-O-O");
             else
-                return format_to(ctx.out(), "0-0-0");
+                return fmt::format_to(ctx.out(), "0-0-0");
         } else {
             auto cp = move.getChessPiece();
             auto sf = move.getStartField();
             auto ef = move.getEndField();
-            return format_to(ctx.out(), "{}{}{}{}{}", chessPieceToLAN(cp), chessFieldToLAN(sf), optionalCaptureIndicator(move),
-                             chessFieldToLAN(ef), optionalMoveSuffixes(move));
+            return fmt::format_to(ctx.out(), "{}{}{}{}{}", chessPieceToLAN(cp), chessFieldToLAN(sf), optionalCaptureIndicator(move),
+                                  chessFieldToLAN(ef), optionalMoveSuffixes(move));
         }
     }
 };

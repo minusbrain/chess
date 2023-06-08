@@ -2,8 +2,8 @@
 #include "board.h"
 
 struct PositionRating {
-    int white_pieces;
-    int black_pieces;
+    int white_pieces = 0;
+    int black_pieces = 0;
 };
 
 static const ChessPiece BLACK_PAWN{Color::BLACK, Piece::PAWN};

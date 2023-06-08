@@ -17,7 +17,7 @@ struct fmt::formatter<ChessPiece> {
 
     template <typename FormatContext>
     auto format(const ChessPiece &p, FormatContext &ctx) {
-        return format_to(ctx.out(), "{}", getDebugCharForPiece(p));
+        return fmt::format_to(ctx.out(), "{}", getDebugCharForPiece(p));
     }
 };
 
@@ -32,7 +32,7 @@ struct fmt::formatter<ChessField> {
 
     template <typename FormatContext>
     auto format(const ChessField &f, FormatContext &ctx) {
-        return format_to(ctx.out(), "{}{}", std::get<ChessFileIdx>(f), std::get<ChessRankIdx>(f));
+        return fmt::format_to(ctx.out(), "{}{}", std::get<ChessFileIdx>(f), std::get<ChessRankIdx>(f));
     }
 };
 
@@ -72,30 +72,30 @@ struct fmt::formatter<Board> {
     auto format(const Board &board, FormatContext &ctx) {
         auto it = ctx.out();
         if (!big) {
-            it = format_to(it, "\n abcdefgh\n");
+            it = fmt::format_to(it, "\n abcdefgh\n");
             for (int row = 8; row > 0; --row) {
-                it = format_to(it, "{}", row);
+                it = fmt::format_to(it, "{}", row);
                 for (int line = A; line <= H; ++line) {
                     auto cp = board.getPieceOnField(line, row);
-                    it = (cp.has_value() ? format_to(it, "{}", cp.value()) : format_to(it, " "));
+                    it = (cp.has_value() ? fmt::format_to(it, "{}", cp.value()) : fmt::format_to(it, " "));
                 }
-                it = format_to(it, "{}\n", row);
+                it = fmt::format_to(it, "{}\n", row);
             }
-            it = format_to(it, " abcdefgh\n");
+            it = fmt::format_to(it, " abcdefgh\n");
         } else {
-            it = format_to(it, "\n     a     b     c     d     e     f     g     h\n");
-            it = format_to(it, "  +-----+-----+-----+-----+-----+-----+-----+-----+\n");
+            it = fmt::format_to(it, "\n     a     b     c     d     e     f     g     h\n");
+            it = fmt::format_to(it, "  +-----+-----+-----+-----+-----+-----+-----+-----+\n");
             for (int row = 8; row > 0; --row) {
-                it = format_to(it, "  |     |     |     |     |     |     |     |     |\n");
-                it = format_to(it, "{} ", row);
+                it = fmt::format_to(it, "  |     |     |     |     |     |     |     |     |\n");
+                it = fmt::format_to(it, "{} ", row);
                 for (int line = 1; line <= H; ++line) {
                     auto cp = board.getPieceOnField(line, row);
-                    it = (cp.has_value() ? format_to(it, "|  {}  ", cp.value()) : format_to(it, "|     "));
+                    it = (cp.has_value() ? fmt::format_to(it, "|  {}  ", cp.value()) : fmt::format_to(it, "|     "));
                 }
-                it = format_to(it, "| {}\n  |     |     |     |     |     |     |     |     |\n", row);
-                it = format_to(it, "  +-----+-----+-----+-----+-----+-----+-----+-----+\n");
+                it = fmt::format_to(it, "| {}\n  |     |     |     |     |     |     |     |     |\n", row);
+                it = fmt::format_to(it, "  +-----+-----+-----+-----+-----+-----+-----+-----+\n");
             }
-            it = format_to(it, "     a     b     c     d     e     f     g     h\n");
+            it = fmt::format_to(it, "     a     b     c     d     e     f     g     h\n");
         }
 
         return it;
