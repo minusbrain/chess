@@ -18,9 +18,18 @@ class ChessGame : base::NONCOPYABLE {
 
     void startSyncronousGame(bool fullOutput = true);
 
+    void startAsyncronousGame();
+    bool doAsyncMove(Color color, Move move);
+    const Board& getBoard() const;
+
+    enum class State { IDLE, RUNNING, FINISHED };
+
+    State getState() const;
+
    private:
     Board _board;
     ChessPlayer& _white;
     ChessPlayer& _black;
     ChessGameProgress _progress;
+    State _state;
 };

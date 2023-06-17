@@ -1,3 +1,7 @@
+#include "chess_game.h"
+
+#include <base/improve_containers.h>
+
 #include <iostream>
 #include <memory>
 #include <optional>
@@ -5,18 +9,23 @@
 
 #include "board_debug.h"
 #include "board_factory.h"
-#include "chess_game.h"
 #include "fmt/core.h"
 #include "move_debug.h"
 #include "rules.h"
 #include "types.h"
 
 ChessGame::ChessGame(ChessPlayer& white, ChessPlayer& black)
-    : _board(BoardFactory::createStandardBoard()), _white(white), _black(black), _progress(_board, {}) {}
+    : _board(BoardFactory::createStandardBoard()), _white(white), _black(black), _progress(_board, {}), _state(State::IDLE) {}
 
 bool isGameOver(Board& board) { return ChessRules::isCheckMate(board) || ChessRules::isStaleMate(board) || board.getHalfMoveClock() > 50; }
 
+ChessGame::State ChessGame::getState() const { return _state; }
+
 void ChessGame::startSyncronousGame(bool fullOutput) {
+    if (_state != State::IDLE) {
+        fmt::print("ChessGame state is not IDLE. Start a new game instead.\n");
+    }
+    _state = State::RUNNING;
     ChessPlayer* currentPlayer = &_white;
 
     if (fullOutput) fmt::print("ChessGame between {} (white) and {} (black)\n", _white.getName(), _black.getName());
@@ -34,6 +43,8 @@ void ChessGame::startSyncronousGame(bool fullOutput) {
         assert(ChessRules::applyMove(_board, move, true));
         _progress.addMove(move, _board, {});
     }
+
+    _state = State::FINISHED;
 
     if (fullOutput) {
         int stateCtr = 0;
@@ -64,3 +75,25 @@ void ChessGame::startSyncronousGame(bool fullOutput) {
         fmt::print("Game ends in a tie due to 50 move rule\n");
     }
 }
+
+void ChessGame::startAsyncronousGame() {
+    if (_state != State::IDLE) {
+        fmt::print("ChessGame state is not IDLE. Start a new game instead.\n");
+    }
+    _state = State::RUNNING;
+}
+
+bool ChessGame::doAsyncMove(Color color, Move move) {
+    if (color != _board.whosTurnIsIt()) {
+        return false;
+    }
+    auto validMoves = ChessRules::getAllValidMoves(_board);
+    if (base::find(validMoves, move) == validMoves.end()) {
+        return false;
+    }
+    assert(ChessRules::applyMove(_board, move, true));
+    _progress.addMove(move, _board, {});
+    return true;
+}
+
+const Board& ChessGame::getBoard() const { return _board; }
