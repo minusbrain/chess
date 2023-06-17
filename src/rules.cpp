@@ -7,11 +7,8 @@
 
 #include "bench.h"
 #include "board.h"
-#include "board_debug.h"
 #include "board_factory.h"
-#include "fmt/core.h"
 #include "move.h"
-#include "move_debug.h"
 #include "piece_rules.h"
 #include "types.h"
 
@@ -175,7 +172,6 @@ bool ChessRules::applyMove(Board& board, const Move& move, bool assertLegal) {
     bool pawnOrCaptureMove = false;
 
     if (assertLegal && board.isLegalPosition() == false) {
-        fmt::print("Input of applyMove() illegal: {} Move: {}\n", board.getFENString(), move);
         assert(false);
     }
 
@@ -322,7 +318,6 @@ bool ChessRules::applyMove(Board& board, const Move& move, bool assertLegal) {
     }
 
     if (assertLegal && board.isLegalPosition() == false) {
-        fmt::print("Output of applyMove() illegal: {} Move: {}\n", board.getFENString(), move);
         assert(false);
     }
 
