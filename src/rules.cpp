@@ -90,6 +90,14 @@ std::vector<Move> ChessRules::getAllValidMoves(const Board& board, bool annotate
     return validMoves;
 }
 
+std::vector<Move> ChessRules::getAllValidMoves(const Board& board, ChessField field, bool annotate) {
+    std::vector<Move> validMoves = getAllValidMoves(board, annotate);
+
+    std::erase_if(validMoves, [&field](const Move& move) { return move.getStartField() != field; });
+
+    return validMoves;
+}
+
 void ChessRules::annotateMoves(const Board& board, std::vector<Move>& moves) {
     for (auto& move : moves) {
         Board resultingBoard(board);

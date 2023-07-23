@@ -10,6 +10,7 @@ class ChessRules {
    public:
     static std::vector<Move> getAllPotentialMoves(const Board& board);
     static std::vector<Move> getAllValidMoves(const Board& board, bool annotate = true);
+    static std::vector<Move> getAllValidMoves(const Board& board, ChessField field, bool annotate = true);
     static void annotateMoves(const Board& board, std::vector<Move>& moves);
 
     static bool isCheck(const Board& board);
