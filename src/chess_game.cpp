@@ -38,6 +38,11 @@ void ChessGame::startSyncronousGame(bool fullOutput) {
         if (fullOutput) fmt::print("It is {}'s turn\n", currentPlayer->getName());
 
         std::vector<Move> validMoves = ChessRules::getAllValidMoves(_board, false);
+        if (currentPlayer->useGetMove() == false) {
+            fmt::print("Player {} does not support getMove() and no other way of input supported by this client.",
+                       currentPlayer->getName());
+            assert(currentPlayer->useGetMove());
+        }
         const Move& move = currentPlayer->getMove(_board, validMoves);
         if (fullOutput) fmt::print("{} plays {}\n", currentPlayer->getName(), move);
 
