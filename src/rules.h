@@ -13,6 +13,7 @@ class ChessRules {
     static std::vector<Move> getAllValidMoves(const Board& board, ChessField field, bool annotate = true);
     static void annotateMoves(const Board& board, std::vector<Move>& moves);
 
+    static bool isGameOver(const Board& board);
     static bool isCheck(const Board& board);
     static bool isCheckMate(const Board& board, bool checkHint = false);
     static bool isStaleMate(const Board& board, bool checkHint = true);

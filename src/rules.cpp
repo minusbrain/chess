@@ -50,6 +50,8 @@ bool ChessRules::isStaleMate(const Board& board, bool checkHint) {
     return false;
 };
 
+bool ChessRules::isGameOver(const Board& board) { return isCheckMate(board) || isStaleMate(board) || board.getHalfMoveClock() > 50; }
+
 bool ChessRules::isFieldCoveredByColor(const Board& board, const ChessField& field, Color color) {
     Board tempBoard(board);
     Color oppositeColor = getOppositeColor(color);

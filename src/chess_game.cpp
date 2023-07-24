@@ -17,7 +17,6 @@
 ChessGame::ChessGame(ChessPlayer& white, ChessPlayer& black)
     : _board(BoardFactory::createStandardBoard()), _white(white), _black(black), _progress(_board, {}), _state(State::IDLE) {}
 
-bool isGameOver(Board& board) { return ChessRules::isCheckMate(board) || ChessRules::isStaleMate(board) || board.getHalfMoveClock() > 50; }
 
 ChessGame::State ChessGame::getState() const { return _state; }
 
@@ -29,7 +28,7 @@ void ChessGame::startSyncronousGame(bool fullOutput) {
     ChessPlayer* currentPlayer = &_white;
 
     if (fullOutput) fmt::print("ChessGame between {} (white) and {} (black)\n", _white.getName(), _black.getName());
-    while (!isGameOver(_board)) {
+    while (!ChessRules::isGameOver(_board)) {
         currentPlayer = (_board.whosTurnIsIt() == Color::WHITE ? &_white : &_black);
 
         if (fullOutput) fmt::print("\n{:b}\n{}\n", _board, _board.getFENString(true));
@@ -84,6 +83,7 @@ void ChessGame::startAsyncronousGame() {
 }
 
 bool ChessGame::doAsyncMove(Color color, Move move) {
+    assert(_state == State::RUNNING);
     if (color != _board.whosTurnIsIt()) {
         return false;
     }
@@ -93,6 +93,9 @@ bool ChessGame::doAsyncMove(Color color, Move move) {
     }
     assert(ChessRules::applyMove(_board, move, true));
     _progress.addMove(move, _board, {});
+    if (ChessRules::isGameOver(_board)) {
+        _state = State::FINISHED;
+    }
     return true;
 }
 
