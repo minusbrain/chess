@@ -12,6 +12,7 @@ class ChessPlayer {
 
     virtual const std::string& getName() const;
     virtual Move getMove(const Board& board, const std::vector<Move>& potentialMoves) = 0;
+    virtual bool useGetMove() { return true; }
 
    private:
     std::string _name;
@@ -38,9 +39,9 @@ class OneMoveDeepBestPositionChessPlayer : public ChessPlayer {
     Move getMove(const Board& board, const std::vector<Move>& potentialMoves) override;
 };
 
-class HumanChessPlayer : public ChessPlayer {
+class HumanConsolePlayer : public ChessPlayer {
    public:
-    HumanChessPlayer(const std::string& name);
+    HumanConsolePlayer(const std::string& name);
 
     Move getMove(const Board& board, const std::vector<Move>& potentialMoves) override;
 };

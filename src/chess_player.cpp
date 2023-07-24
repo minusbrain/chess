@@ -63,9 +63,9 @@ Move OneMoveDeepBestPositionChessPlayer::getMove(const Board& board, const std::
     return potentialMoves[std::distance(ratingsInMyFavor.begin(), maxIt)];
 }
 
-HumanChessPlayer::HumanChessPlayer(const std::string& name) : ChessPlayer(name) {}
+HumanConsolePlayer::HumanConsolePlayer(const std::string& name) : ChessPlayer(name) {}
 
-Move HumanChessPlayer::getMove(const Board&, const std::vector<Move>& potentialMoves) {
+Move HumanConsolePlayer::getMove(const Board&, const std::vector<Move>& potentialMoves) {
     assert(potentialMoves.size() > 0);
     int i = 0;
     for (auto& move : potentialMoves) {

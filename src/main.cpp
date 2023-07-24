@@ -59,7 +59,7 @@ int main(int argc, char** argv) {
 
     if (options.is_flag_set("game")) {
         OneMoveDeepBestPositionChessPlayer whitePlayer{"Andreas"};
-        HumanChessPlayer blackPlayer{"Human"};
+        HumanConsolePlayer blackPlayer{"Human"};
         ChessGame game{whitePlayer, blackPlayer};
         game.startSyncronousGame();
     } else if (options.get<int>("sim") > 0) {
