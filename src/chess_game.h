@@ -22,6 +22,10 @@ class ChessGame : base::NONCOPYABLE {
     bool doAsyncMove(Color color, Move move);
     const Board& getBoard() const;
 
+    ChessPlayer& getWhite();
+    ChessPlayer& getBlack();
+    ChessPlayer& getMovingPlayer();
+
     enum class State { IDLE, RUNNING, FINISHED };
 
     State getState() const;

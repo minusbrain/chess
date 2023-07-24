@@ -17,6 +17,9 @@
 ChessGame::ChessGame(ChessPlayer& white, ChessPlayer& black)
     : _board(BoardFactory::createStandardBoard()), _white(white), _black(black), _progress(_board, {}), _state(State::IDLE) {}
 
+ChessPlayer& ChessGame::getWhite() { return _white; }
+ChessPlayer& ChessGame::getBlack() { return _black; }
+ChessPlayer& ChessGame::getMovingPlayer() { return (_board.whosTurnIsIt() == Color::WHITE ? _white : _black); }
 
 ChessGame::State ChessGame::getState() const { return _state; }
 
