@@ -38,7 +38,6 @@ build/
 release/
 debug/
 bin/
-lib/
 html/
 latex/
 
