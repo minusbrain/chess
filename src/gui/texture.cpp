@@ -8,7 +8,7 @@ Texture::Texture(SDL_Renderer *renderer, const std::string &file, const SDL_Poin
     : _texture(nullptr), _width(0), _height(0) {
     SDL_Surface *loadedSurface = IMG_Load(file.c_str());
     if (loadedSurface == nullptr) {
-        return;
+        throw std::invalid_argument{"Could not open texture file " + file};
     }
 
     _width = loadedSurface->w;

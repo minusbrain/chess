@@ -8,6 +8,7 @@
 #include <stdio.h>
 
 #include <array>
+#include <exception>
 #include <optional>
 #include <string>
 
@@ -184,6 +185,16 @@ int main(int, char**) {
     // SDL_GetRendererInfo(renderer, &info);
     // SDL_Log("Current SDL_Renderer: %s", info.name);
 
+    AssetMap assets;
+    try {
+        assets = loadAssets("assets/pieces.json", renderer);
+    } catch (const std::exception& ex) {
+        fmt::println("Could not load assets from assets/pieces.json. Error: {}", ex.what());
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        SDL_Quit();
+    }
+
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -199,8 +210,6 @@ int main(int, char**) {
     // Setup Platform/Renderer backends
     ImGui_ImplSDL2_InitForSDLRenderer(window, renderer);
     ImGui_ImplSDLRenderer2_Init(renderer);
-
-    auto assets = loadAssets("assets/pieces.json", renderer);
 
     OneMoveDeepBestPositionChessPlayer whitePlayer{"Andreas"};
     HumanGuiPlayer blackPlayer{"Human"};

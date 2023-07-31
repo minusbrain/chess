@@ -44,10 +44,12 @@ add_subdirectory(ext)
 add_subdirectory(src)
 add_subdirectory(docs)
 
-add_custom_target(chess_meta DEPENDS chess run_chess test_chess)
+configure_file(./assets/pieces.json ./assets/pieces.json COPYONLY)
+configure_file(./assets/pieces.png ./assets/pieces.png COPYONLY)
+configure_file(./assets/marker.png ./assets/marker.png COPYONLY)
 
-file(COPY assets DESTINATION ${CMAKE_BINARY_DIR})
 install(TARGETS chess DESTINATION lib)
 install(TARGETS chess_gui DESTINATION bin)
 install(DIRECTORY assets DESTINATION bin)
 
+add_custom_target(chess_meta DEPENDS chess run_chess test_chess chess_gui)
