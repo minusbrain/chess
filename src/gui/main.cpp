@@ -102,11 +102,15 @@ void update_logtext(GuiState& state) {
         if (move != endIt) {
             std::shared_ptr<Move> secondMove = (*move)->moveToNext;
             if (secondMove) {
-                state.log_text += fmt::format("{}: {} {}\n", ++i, *firstMove, *secondMove);
+                state.log_text += fmt::format("{}: {} {}", ++i, *firstMove, *secondMove);
+                if (i % 4 == 0)
+                    state.log_text += "\n";
+                else
+                    state.log_text += "  ";
                 continue;
             }
         }
-        state.log_text += fmt::format("{}: {}\n", ++i, *firstMove);
+        state.log_text += fmt::format("{}: {}", ++i, *firstMove);
     }
 }
 
