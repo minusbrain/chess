@@ -1,5 +1,9 @@
 # Chess Engine and GUI
 
+<p align="center">
+  <img src="./docs/chess_pieces.png" />
+</p>
+
 This is going to be a simple chess engine allowing local matches between two humans, human vs CPU or CPU vs CPU.
 There are two reasons for its creation. I wanna improve my understanding of chess and I wanna train my C++ skills
 as my work doesn't allow me to do that currently.
