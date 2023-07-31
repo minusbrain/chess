@@ -1,24 +1,20 @@
+#include "main.h"
+
 #include <SDL.h>
-#include <board.h>
-#include <board_debug.h>
-#include <board_factory.h>
-#include <chess_game.h>
 #include <fmt/core.h>
 #include <fmt/format.h>
-#include <imgui.h>
 #include <imgui_impl_sdl2.h>
 #include <imgui_impl_sdlrenderer2.h>
-#include <move_debug.h>
 #include <stdio.h>
-#include <types.h>
 
 #include <array>
 #include <optional>
 #include <string>
 
 #include "assets.h"
+#include "board_window.h"
 #include "human_gui_player.h"
-#include "rules.h"
+#include "log_window.h"
 #include "sdl_helper.h"
 #include "sprite.h"
 #include "texture.h"
@@ -35,41 +31,9 @@ std::map<ChessPiece, std::string> piece_2_asset{
     {{Color::WHITE, Piece::QUEEN}, "white_queen"},   {{Color::BLACK, Piece::QUEEN}, "black_queen"},
     {{Color::WHITE, Piece::KING}, "white_king"},     {{Color::BLACK, Piece::KING}, "black_king"}};
 
-enum FieldState { NORMAL = 0, SELECTED_HAS_MOVES, SELECTED_NO_MOVES, MOVE_OPTION, CHECK, CHECK_MATE, LAST_MOVE };
-struct GuiState {
-    GuiState(ChessPlayer& white, ChessPlayer& black) : game(white, black) {}
-
-    // Game State
-    ChessGame game;
-    bool runGame = true;
-
-    // GUI State
-    std::optional<ChessField> selectedField;
-    std::optional<ChessField> lastMove;
-    std::vector<Move> validMoves;
-    std::vector<Move> validMovesOfSelectedPiece;
-    bool board_state_changed = true;
-
-    bool show_demo_window = false;
-    bool show_chess = true;
-    bool show_chess_log = true;
-    std::array<FieldState, 64> fieldStates;
-
-    std::string log_text;
-};
-
-static ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-static ImVec4 orange = ImVec4(239.0f / 255, 163.0f / 255, 10.0f / 255, 1.0f);
-static ImVec4 red = ImVec4(0.8f, 0.0f, 0.0f, 1.0f);
-static ImVec4 light_green = ImVec4(120.0f / 255, 1.0f, 120.0f / 255, 1.0f);
-static ImVec4 green = ImVec4(0.0f, 0.8f, 0.0f, 1.0f);
-static ImVec4 white = ImVec4(0.4f, 0.4f, 0.8f, 1.0f);
-static ImVec4 black = ImVec4(0.0f, 0.0f, 0.2f, 1.0f);
-static ImVec4 grey = ImVec4(0.7f, 0.7f, 0.7f, 1.0f);
-
-std::map<FieldState, ImVec4> FieldStateColors{{FieldState::SELECTED_HAS_MOVES, green}, {FieldState::SELECTED_NO_MOVES, orange},
-                                              {FieldState::MOVE_OPTION, light_green},  {FieldState::CHECK, orange},
-                                              {FieldState::CHECK_MATE, red},           {FieldState::LAST_MOVE, grey}};
+const std::map<FieldState, ImVec4> FieldStateColors{{FieldState::SELECTED_HAS_MOVES, green}, {FieldState::SELECTED_NO_MOVES, orange},
+                                                    {FieldState::MOVE_OPTION, light_green},  {FieldState::CHECK, orange},
+                                                    {FieldState::CHECK_MATE, red},           {FieldState::LAST_MOVE, grey}};
 
 void doMove(GuiState& state, ChessField start, ChessField end) {
     for (auto& move : state.validMoves) {
@@ -80,37 +44,6 @@ void doMove(GuiState& state, ChessField start, ChessField end) {
             state.board_state_changed = true;
             return;
         }
-    }
-}
-
-void update_logtext(GuiState& state) {
-    state.log_text = fmt::format("It's {}'s move ({})\n", state.game.getMovingPlayer().getName(), state.game.getBoard().whosTurnIsIt());
-    state.log_text += fmt::format("All available moves: {}\n", state.validMoves);
-    if (state.selectedField) {
-        state.log_text +=
-            fmt::format("Selected {:u} on field {:u} has the following potential moves: {}\n",
-                        state.game.getBoard().getPieceOnField(state.selectedField.value()).value_or(ChessPiece{Color::WHITE, Piece::DECOY}),
-                        state.selectedField.value(), state.validMovesOfSelectedPiece);
-    }
-    state.log_text += "Previous moves:\n";
-    int i = 0;
-    auto endIt = state.game.getProgress().end();
-    for (auto move = state.game.getProgress().begin(); move != endIt; ++move) {
-        std::shared_ptr<Move> firstMove = (*move)->moveToNext;
-        if (!firstMove) continue;
-        ++move;
-        if (move != endIt) {
-            std::shared_ptr<Move> secondMove = (*move)->moveToNext;
-            if (secondMove) {
-                state.log_text += fmt::format("{}: {} {}", ++i, *firstMove, *secondMove);
-                if (i % 4 == 0)
-                    state.log_text += "\n";
-                else
-                    state.log_text += "  ";
-                continue;
-            }
-        }
-        state.log_text += fmt::format("{}: {}", ++i, *firstMove);
     }
 }
 
@@ -167,6 +100,29 @@ void draw_gui(SDL_Renderer* renderer, const AssetMap& assets, GuiState& state) {
     ImGui_ImplSDL2_NewFrame();
     ImGui::NewFrame();
 
+    auto chessFieldClickHandler = [&state](ChessField field) {
+        auto piece = state.game.getBoard().getPieceOnField(field);
+        auto fieldState = state.fieldStates[BoardHelper::fieldToIndex(field)];
+
+        if (fieldState != FieldState::NORMAL) {
+            if (state.selectedField && fieldState == FieldState::MOVE_OPTION && !piece) {
+                doMove(state, state.selectedField.value(), field);
+            }
+        }
+
+        if (piece) {
+            if (state.selectedField && state.selectedField.value() == field) {
+                state.selectedField = std::nullopt;
+                state.board_state_changed = true;
+            } else if (state.selectedField && state.selectedField.value() != field && fieldState == FieldState::MOVE_OPTION) {
+                doMove(state, state.selectedField.value(), field);
+            } else {
+                state.selectedField = field;
+                state.board_state_changed = true;
+            }
+        }
+    };
+
     // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about
     // Dear ImGui!).
     if (state.show_demo_window) ImGui::ShowDemoWindow(&state.show_demo_window);
@@ -186,72 +142,11 @@ void draw_gui(SDL_Renderer* renderer, const AssetMap& assets, GuiState& state) {
 
     // 3. Show another simple window.
     if (state.show_chess) {
-        static float scale = 2.0f;
-
-        ImGui::Begin("Chess Board");
-        // ImGui::ColorEdit3("White", (float*)&white);
-        // ImGui::ColorEdit3("Black", (float*)&black);
-        // ImGui::SliderFloat("Chess Scale", &scale, 0.5f, 4.0f);  // Edit 1 float using a slider from 0.0f to 1.0f
-
-        if (ImGui::BeginTable("Board", 8)) {
-            for (int i = 0; i < 8; ++i) ImGui::TableSetupColumn("", ImGuiTableColumnFlags_WidthFixed, 32.0f * scale);
-
-            for (int row = 0; row < 8; row++) {
-                ImGui::TableNextRow(ImGuiTableRowFlags_None, 34.0f * scale);
-
-                for (int column = 0; column < 8; column++) {
-                    ImGui::TableSetColumnIndex(column);
-                    ChessField field{column + 1, 8 - row};
-                    auto piece = state.game.getBoard().getPieceOnField(field);
-                    auto fieldState = state.fieldStates[BoardHelper::fieldToIndex(field)];
-
-                    if (fieldState == FieldState::NORMAL) {
-                        if (row % 2 == 0) {
-                            ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg,
-                                                   column % 2 == 0 ? ImGui::GetColorU32(white) : ImGui::GetColorU32(black));
-
-                        } else {
-                            ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg,
-                                                   column % 2 == 0 ? ImGui::GetColorU32(black) : ImGui::GetColorU32(white));
-                        }
-                    } else {
-                        ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, ImGui::GetColorU32(FieldStateColors[fieldState]));
-                        if (state.selectedField && fieldState == FieldState::MOVE_OPTION && !piece) {
-                            if (get<Sprite>(assets, "green_marker")->drawToGuiAsButton(fmt::format("bt_{}_{}", row, column), 1)) {
-                                doMove(state, state.selectedField.value(), field);
-                            }
-                        }
-                    }
-
-                    if (piece) {
-                        if (get<Sprite>(assets, piece_2_asset[*piece])->drawToGuiAsButton(fmt::format("bt_{}_{}", row, column), scale)) {
-                            if (state.selectedField && state.selectedField.value() == field) {
-                                state.selectedField = std::nullopt;
-                                state.board_state_changed = true;
-                            } else if (state.selectedField && state.selectedField.value() != field &&
-                                       fieldState == FieldState::MOVE_OPTION) {
-                                doMove(state, state.selectedField.value(), field);
-                            } else {
-                                state.selectedField = field;
-                                state.board_state_changed = true;
-                            }
-                        }
-                    }
-                }
-            }
-            ImGui::EndTable();
-        }
-
-        // ImGui::ShowMetricsWindow();
-        ImGui::End();
+        drawChessBoardWindow(assets, state, chessFieldClickHandler);
     }
 
     if (state.show_chess_log) {
-        ImGui::Begin("Chess Log");
-        // Using shortcut. You can use PushTextWrapPos()/PopTextWrapPos() for more flexibility.
-        ImGui::TextWrapped("%s", state.log_text.c_str());
-        ImGui::Spacing();
-        ImGui::End();
+        drawLogWindow(assets, state);
     }
 
     // Rendering

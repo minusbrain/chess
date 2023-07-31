@@ -1,4 +1,6 @@
 set (SOURCE_CPP
+   board_window.cpp
+   log_window.cpp
    main.cpp
    texture.cpp
    sprite.cpp

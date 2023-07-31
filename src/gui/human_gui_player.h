@@ -1,4 +1,5 @@
-#include <chess_player.h>
+#pragma once
+#include <chess.h>
 
 class HumanGuiPlayer : public ChessPlayer {
    public:

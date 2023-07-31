@@ -1,4 +1,3 @@
-
 #include "assets.h"
 
 #include <SDL_render.h>
