@@ -84,7 +84,7 @@ void doMove(GuiState& state, ChessField start, ChessField end) {
 }
 
 void update_logtext(GuiState& state) {
-    state.log_text = fmt::format("It's {}'s move\n", state.game.getMovingPlayer().getName());
+    state.log_text = fmt::format("It's {}'s move ({})\n", state.game.getMovingPlayer().getName(), state.game.getBoard().whosTurnIsIt());
     state.log_text += fmt::format("All available moves: {}\n", state.validMoves);
     if (state.selectedField) {
         state.log_text +=
@@ -92,8 +92,7 @@ void update_logtext(GuiState& state) {
                         state.game.getBoard().getPieceOnField(state.selectedField.value()).value_or(ChessPiece{Color::WHITE, Piece::DECOY}),
                         state.selectedField.value(), state.validMovesOfSelectedPiece);
     }
-
-    // Valid Moves:{}", state.game.getBoard().whosTurnIsIt() == Color::WHITE ? "whites" : "blacks", state.validMoves);
+    state.log_text += "\n";
 }
 
 void update_state(GuiState& state) {

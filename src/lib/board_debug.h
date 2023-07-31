@@ -8,8 +8,6 @@
 #include "common_debug.h"
 #include "types.h"
 
-inline std::string getStringFromColor(const Color &col) { return col == Color::WHITE ? "white" : "black"; }
-
 inline std::string getStringFromPiece(const Piece &piece) {
     switch (piece) {
         case Piece::PAWN:
@@ -39,6 +37,36 @@ inline std::string getStringFromChessField(const ChessField &cf) {
 
     return ss.str();
 }
+
+/**
+ * @brief Allows printing out chess pieces with fmt
+ *
+ * @tparam Piece
+ */
+template <>
+struct fmt::formatter<Piece> {
+    constexpr auto parse(format_parse_context &ctx) { return ctx.begin(); }
+
+    template <typename FormatContext>
+    auto format(const Piece &p, FormatContext &ctx) {
+        return fmt::format_to(ctx.out(), "{}", getStringFromPiece(p));
+    }
+};
+
+/**
+ * @brief Allows printing out chess colors with fmt
+ *
+ * @tparam Color
+ */
+template <>
+struct fmt::formatter<Color> {
+    constexpr auto parse(format_parse_context &ctx) { return ctx.begin(); }
+
+    template <typename FormatContext>
+    auto format(const Color &col, FormatContext &ctx) {
+        return fmt::format_to(ctx.out(), "{}", col == Color::WHITE ? "white" : "black");
+    }
+};
 
 /**
  * @brief Allows printing out chess-pieces with fmt
@@ -77,7 +105,7 @@ struct fmt::formatter<ChessPiece> {
         if (outputType == OutputType::DEBUG)
             return fmt::format_to(ctx.out(), "{}", getDebugCharForPiece(p));
         else
-            return fmt::format_to(ctx.out(), "{} {}", getStringFromColor(std::get<Color>(p)), getStringFromPiece(std::get<Piece>(p)));
+            return fmt::format_to(ctx.out(), "{} {}", std::get<Color>(p), std::get<Piece>(p));
     }
 };
 
