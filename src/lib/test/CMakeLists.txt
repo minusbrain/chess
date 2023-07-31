@@ -4,6 +4,7 @@ set (TEST_SOURCE_CPP
    main.cpp
    common.cpp
    test_board.cpp
+   test_debug.cpp
    test_rules.cpp
    test_move.cpp
 )

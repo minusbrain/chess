@@ -88,7 +88,7 @@ void update_logtext(GuiState& state) {
     state.log_text += fmt::format("All available moves: {}\n", state.validMoves);
     if (state.selectedField) {
         state.log_text +=
-            fmt::format("Selected piece {} on {} has the following potential moves: {}\n",
+            fmt::format("Selected {:u} on field {:u} has the following potential moves: {}\n",
                         state.game.getBoard().getPieceOnField(state.selectedField.value()).value_or(ChessPiece{Color::WHITE, Piece::DECOY}),
                         state.selectedField.value(), state.validMovesOfSelectedPiece);
     }

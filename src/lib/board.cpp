@@ -8,6 +8,7 @@
 #include <optional>
 #include <string>
 
+#include "board_debug.h"
 #include "common_debug.h"
 #include "move.h"
 #include "types.h"
@@ -20,15 +21,6 @@ Board::Board()
       _halfmoveClock(0),
       _fullMoves(0),
       _legality(Legality::UNDETERMINED) {}
-
-std::string getStringFromChessField(const ChessField& cf) {
-    std::stringstream ss;
-
-    ss << (char)(std::get<ChessFileIdx>(cf) - (char)1 + 'a');
-    ss << (char)(std::get<ChessRankIdx>(cf) + '0');
-
-    return ss.str();
-}
 
 ChessField getChessFieldFromString(std::string str) {
     char filechar = str[0];

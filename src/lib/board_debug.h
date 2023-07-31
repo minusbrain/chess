@@ -2,37 +2,123 @@
 #include <fmt/core.h>
 #include <fmt/format.h>
 
+#include <sstream>
+
 #include "board.h"
 #include "common_debug.h"
 #include "types.h"
 
+inline std::string getStringFromColor(const Color &col) { return col == Color::WHITE ? "white" : "black"; }
+
+inline std::string getStringFromPiece(const Piece &piece) {
+    switch (piece) {
+        case Piece::PAWN:
+            return "pawn";
+        case Piece::ROOK:
+            return "rook";
+        case Piece::KNIGHT:
+            return "knight";
+        case Piece::BISHOP:
+            return "bishop";
+        case Piece::QUEEN:
+            return "queen";
+        case Piece::KING:
+            return "king";
+        case Piece::DECOY:
+            return "decoy";
+        default:
+            return "";
+    }
+}
+
+inline std::string getStringFromChessField(const ChessField &cf) {
+    std::stringstream ss;
+
+    ss << (char)(std::get<ChessFileIdx>(cf) - (char)1 + 'a');
+    ss << (char)(std::get<ChessRankIdx>(cf) + '0');
+
+    return ss.str();
+}
+
 /**
  * @brief Allows printing out chess-pieces with fmt
+ *
+ * Supports formating option :u to print out more user friendly output
+ * Example:
+ * @code {.cpp}
+ * fmt::print("Piece: {}\n", ChessPiece{Color::BLACK, Piece::PAWN});   // "p"
+ * fmt::print("Piece: {:u}\n", ChessPiece{Color::BLACK, Piece::PAWN}); // "black pawn"
+ * @endcode
  *
  * @tparam ChessPiece
  */
 template <>
 struct fmt::formatter<ChessPiece> {
-    constexpr auto parse(format_parse_context &ctx) { return ctx.begin(); }
+    enum class OutputType { USER, DEBUG } outputType = OutputType::DEBUG;
+
+    constexpr auto parse(format_parse_context &ctx) {
+        auto it = ctx.begin(), end = ctx.end();
+        while (it != end && *it != '}') {
+            if (*it == 'u') {
+                outputType = OutputType::USER;
+                ++it;
+            }
+        }
+
+        // Check if reached the end of the range:
+        if (it != end && *it != '}') throw format_error("invalid format");
+
+        // Return an iterator past the end of the parsed range:
+        return it;
+    }
 
     template <typename FormatContext>
     auto format(const ChessPiece &p, FormatContext &ctx) {
-        return fmt::format_to(ctx.out(), "{}", getDebugCharForPiece(p));
+        if (outputType == OutputType::DEBUG)
+            return fmt::format_to(ctx.out(), "{}", getDebugCharForPiece(p));
+        else
+            return fmt::format_to(ctx.out(), "{} {}", getStringFromColor(std::get<Color>(p)), getStringFromPiece(std::get<Piece>(p)));
     }
 };
 
 /**
  * @brief Allows printing out chess-field with fmt
  *
+ * Supports formating option :u to print out more user friendly output
+ * Example:
+ * @code {.cpp}
+ * fmt::print("Field: {}\n", ChessField{A, 1});   // "11"
+ * fmt::print("Field: {:u}\n", ChessField{A, 1}); // "a1"
+ * @endcode
+ *
  * @tparam ChessField
  */
 template <>
 struct fmt::formatter<ChessField> {
-    constexpr auto parse(format_parse_context &ctx) { return ctx.begin(); }
+    enum class OutputType { USER, DEBUG } outputType = OutputType::DEBUG;
+
+    constexpr auto parse(format_parse_context &ctx) {
+        auto it = ctx.begin(), end = ctx.end();
+        while (it != end && *it != '}') {
+            if (*it == 'u') {
+                outputType = OutputType::USER;
+                ++it;
+            }
+        }
+
+        // Check if reached the end of the range:
+        if (it != end && *it != '}') throw format_error("invalid format");
+
+        // Return an iterator past the end of the parsed range:
+        return it;
+    }
 
     template <typename FormatContext>
     auto format(const ChessField &f, FormatContext &ctx) {
-        return fmt::format_to(ctx.out(), "{}{}", std::get<ChessFileIdx>(f), std::get<ChessRankIdx>(f));
+        if (outputType == OutputType::DEBUG)
+            return fmt::format_to(ctx.out(), "{}{}", std::get<ChessFileIdx>(f), std::get<ChessRankIdx>(f));
+        else
+            return fmt::format_to(ctx.out(), "{}", getStringFromChessField(f));
     }
 };
 
@@ -46,7 +132,7 @@ struct fmt::formatter<ChessField> {
  * fmt::print("Board: {:b}\n", standardBoard);
  * @endcode
  *
- * @tparam ChessPiece
+ * @tparam Board
  */
 template <>
 struct fmt::formatter<Board> {
