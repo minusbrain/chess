@@ -1,4 +1,4 @@
-# Chess Engine
+# Chess Engine and GUI
 
 This is going to be a simple chess engine allowing local matches between two humans, human vs CPU or CPU vs CPU.
 There are two reasons for its creation. I wanna improve my understanding of chess and I wanna train my C++ skills
@@ -6,9 +6,12 @@ as my work doesn't allow me to do that currently.
 
 # Usage
 
-The project crates two binaries:
+The project crates three binaries:
 * libchess library -> The engine
-* run_chess executable -> A simple executable that uses the library. See below for details of its function.
+* run_chess executable -> A simple command line executable that uses the library. See below for details of its function
+* chess_gui -> A GUI based chess programm that has currently very limited feature support
+
+# run_chess
 
 The current implementation offers three operation modes of the executable:
 
@@ -75,7 +78,6 @@ This is work in progress
 
 ## What the library can't do yet
 
-* Support any kind of GUI
 * Manipulate a board via command line
 * Implement board -> possible moves -> check/check-mate/stale-mate information caching
 * Be properly tested  ;-)
@@ -83,8 +85,11 @@ This is work in progress
 # Licenses and external dependencies
 
 * [This engine is published under MIT license](LICENSE)
-* This engine depends on [aelib](https://github.com/minusbrain/aelib)
-* This engine depends on [fmt](https://github.com/fmtlib/fmt)
+* Depends on [aelib](https://github.com/minusbrain/aelib) - MIT License
+* Depends on [fmt](https://github.com/fmtlib/fmt) - MIT License
+* Depends on [imgui](https://github.com/ocornut/imgui) - MIT License
+* Depends on [nlohmann/json](https://github.com/nlohmann/json) - MIT License
+* Sprites from [Rad Potato](https://rad-potato.itch.io/pixel-perfect-ultimate-game-component-kit) - Creative Commons
 
 # Ideas
 

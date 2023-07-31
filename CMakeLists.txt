@@ -2,8 +2,8 @@ cmake_minimum_required (VERSION 3.13)
 
 # Name of the project
 project (chess)
-
 enable_testing()
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/ext/cmake")
 if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
     message("Activating Code Coverage")
@@ -27,15 +27,27 @@ endif()
 
 set(CMAKE_MODULE_PATH "${CMAKE_CXX_FLAGS}" "${CMAKE_CURRENT_SOURCE_DIR}")
 
-add_subdirectory(ext/fmt EXCLUDE_FROM_ALL)
-include_directories(chess PRIVATE ext/fmt/include)
+find_package(SDL2 REQUIRED)
+find_package(SDL2_image REQUIRED)
 
-add_subdirectory(ext/aelib)
-include_directories(chess PRIVATE ext/aelib)
+include_directories(${SDL2_INCLUDE_DIRS} ${SDL2_IMAGE_INCLUDE_DIRS})
+include_directories(ext/aelib)
+include_directories(ext/imgui)
+include_directories(ext/imgui/backends)
+include_directories(ext/json/include)
+include_directories(ext/fmt/include)
 
+include_directories(src/lib)
+include_directories(src/gui)
+
+add_subdirectory(ext)
 add_subdirectory(src)
 add_subdirectory(docs)
 
 add_custom_target(chess_meta DEPENDS chess run_chess test_chess)
 
+file(COPY assets DESTINATION ${CMAKE_BINARY_DIR})
 install(TARGETS chess DESTINATION lib)
+install(TARGETS chess_gui DESTINATION bin)
+install(DIRECTORY assets DESTINATION bin)
+
