@@ -108,3 +108,5 @@ bool ChessGame::doAsyncMove(Color color, Move move) {
 }
 
 const Board& ChessGame::getBoard() const { return _board; }
+
+ChessGameProgress& ChessGame::getProgress() { return _progress; }

@@ -26,6 +26,8 @@ class ChessGame : base::NONCOPYABLE {
     ChessPlayer& getBlack();
     ChessPlayer& getMovingPlayer();
 
+    ChessGameProgress& getProgress();
+
     enum class State { IDLE, RUNNING, FINISHED };
 
     State getState() const;

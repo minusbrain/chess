@@ -92,7 +92,22 @@ void update_logtext(GuiState& state) {
                         state.game.getBoard().getPieceOnField(state.selectedField.value()).value_or(ChessPiece{Color::WHITE, Piece::DECOY}),
                         state.selectedField.value(), state.validMovesOfSelectedPiece);
     }
-    state.log_text += "\n";
+    state.log_text += "Previous moves:\n";
+    int i = 0;
+    auto endIt = state.game.getProgress().end();
+    for (auto move = state.game.getProgress().begin(); move != endIt; ++move) {
+        std::shared_ptr<Move> firstMove = (*move)->moveToNext;
+        if (!firstMove) continue;
+        ++move;
+        if (move != endIt) {
+            std::shared_ptr<Move> secondMove = (*move)->moveToNext;
+            if (secondMove) {
+                state.log_text += fmt::format("{}: {} {}\n", ++i, *firstMove, *secondMove);
+                continue;
+            }
+        }
+        state.log_text += fmt::format("{}: {}\n", ++i, *firstMove);
+    }
 }
 
 void update_state(GuiState& state) {

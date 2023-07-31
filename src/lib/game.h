@@ -20,12 +20,19 @@ class GameStateIterator {
    public:
     using State = GameState<TGameState, TMove, TExtraData>;
     GameStateIterator(std::shared_ptr<State> curr) : _curr(curr) {}
+    GameStateIterator(GameStateIterator& orig) : _curr(orig._curr) {}
 
     bool operator!=(const GameStateIterator& other) const { return !operator==(other); }
     bool operator==(const GameStateIterator& other) const { return _curr == other._curr; }
     GameStateIterator& operator++() {
         if (_curr != nullptr) _curr = _curr->next;
         return *this;
+    }
+
+    GameStateIterator operator++(int) {
+        GameStateIterator old = *this;
+        operator++();
+        return old;
     }
 
     std::shared_ptr<State> operator*() { return _curr; }
@@ -58,8 +65,8 @@ class Game : public base::NONCOPYANDMOVEABLE {
     }
     std::shared_ptr<State> getCurrentState() { return _last; }
 
-    const Iterator begin() { return Iterator{_root}; }
-    const Iterator end() { return Iterator{nullptr}; }
+    Iterator begin() { return Iterator{_root}; }
+    Iterator end() { return Iterator{nullptr}; }
 
    private:
     std::shared_ptr<State> _root = nullptr;
