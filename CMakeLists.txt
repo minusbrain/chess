@@ -5,6 +5,7 @@ project (chess)
 enable_testing()
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/ext/cmake")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
     message("Activating Code Coverage")
     set(CHESS_CODE_COVERAGE YES)
@@ -24,8 +25,6 @@ if(DEFINED CHESS_CODE_COVERAGE)
     include(CodeCoverage)
     append_coverage_compiler_flags()
 endif()
-
-set(CMAKE_MODULE_PATH "${CMAKE_CXX_FLAGS}" "${CMAKE_CURRENT_SOURCE_DIR}")
 
 find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)
