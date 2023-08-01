@@ -42,6 +42,40 @@ bool addMoveOrIsBlocked(const Board& board, const ChessField& potentialMoveField
     return false;
 }
 
+void addPotentialPawnCaptures(std::vector<Move>& potentialMoves, const Board& board, const ChessField potentialCaptureTargetField,
+                              const ChessPieceOnField pieceOnField) {
+    ChessPiece cp = std::get<ChessPieceIdx>(pieceOnField);
+    Color color = std::get<ColorIdx>(cp);
+    ChessField currentField = std::get<ChessFieldIdx>(pieceOnField);
+    auto potentialCaptureTarget = board.getPieceOnField(potentialCaptureTargetField);
+    if (potentialCaptureTarget.has_value() && std::get<ColorIdx>(potentialCaptureTarget.value()) != color) {
+        Move captureMove = {cp, currentField, potentialCaptureTargetField};
+        if (std::get<ChessRankIdx>(potentialCaptureTargetField) == 8 || std::get<ChessRankIdx>(potentialCaptureTargetField) == 1) {
+            captureMove.addModifier(MoveModifier::CAPTURE);
+            captureMove.addModifier(MoveModifier::PROMOTE_BISHOP);
+            potentialMoves.push_back(captureMove);
+            captureMove.clearModifiers();
+            captureMove.addModifier(MoveModifier::CAPTURE);
+            captureMove.addModifier(MoveModifier::PROMOTE_KNIGHT);
+            potentialMoves.push_back(captureMove);
+            captureMove.clearModifiers();
+            captureMove.addModifier(MoveModifier::CAPTURE);
+            captureMove.addModifier(MoveModifier::PROMOTE_ROOK);
+            potentialMoves.push_back(captureMove);
+            captureMove.clearModifiers();
+            captureMove.addModifier(MoveModifier::CAPTURE);
+            captureMove.addModifier(MoveModifier::PROMOTE_QUEEN);
+            potentialMoves.push_back(std::move(captureMove));
+        } else {
+            captureMove.addModifier(MoveModifier::CAPTURE);
+            potentialMoves.push_back(std::move(captureMove));
+        }
+    } else if (potentialCaptureTargetField == board.getEnPassantTarget()) {
+        potentialMoves.emplace_back(cp, currentField, potentialCaptureTargetField,
+                                    std::set<MoveModifier>{MoveModifier::CAPTURE, MoveModifier::EN_PASSANT});
+    }
+}
+
 std::vector<Move> PawnRules::getPotentialMoves(const Board& board, ChessPieceOnField pieceOnField) {
     std::vector<Move> potentialMoves;
     potentialMoves.reserve(4);
@@ -89,63 +123,11 @@ std::vector<Move> PawnRules::getPotentialMoves(const Board& board, ChessPieceOnF
     }
     if (currentFile != A) {
         ChessField potentialCaptureTargetField = {currentFile - 1, currentRank + direction};
-        auto potentialCaptureTarget = board.getPieceOnField(potentialCaptureTargetField);
-        if (potentialCaptureTarget.has_value() && std::get<ColorIdx>(potentialCaptureTarget.value()) != color) {
-            Move captureMove = {cp, currentField, potentialCaptureTargetField};
-            if (std::get<ChessRankIdx>(potentialCaptureTargetField) == 8 || std::get<ChessRankIdx>(potentialCaptureTargetField) == 1) {
-                captureMove.addModifier(MoveModifier::CAPTURE);
-                captureMove.addModifier(MoveModifier::PROMOTE_BISHOP);
-                potentialMoves.push_back(captureMove);
-                captureMove.clearModifiers();
-                captureMove.addModifier(MoveModifier::CAPTURE);
-                captureMove.addModifier(MoveModifier::PROMOTE_KNIGHT);
-                potentialMoves.push_back(captureMove);
-                captureMove.clearModifiers();
-                captureMove.addModifier(MoveModifier::CAPTURE);
-                captureMove.addModifier(MoveModifier::PROMOTE_ROOK);
-                potentialMoves.push_back(captureMove);
-                captureMove.clearModifiers();
-                captureMove.addModifier(MoveModifier::CAPTURE);
-                captureMove.addModifier(MoveModifier::PROMOTE_QUEEN);
-                potentialMoves.push_back(std::move(captureMove));
-            } else {
-                captureMove.addModifier(MoveModifier::CAPTURE);
-                potentialMoves.push_back(std::move(captureMove));
-            }
-        } else if (potentialCaptureTargetField == board.getEnPassantTarget()) {
-            potentialMoves.emplace_back(cp, currentField, potentialCaptureTargetField,
-                                        std::set<MoveModifier>{MoveModifier::CAPTURE, MoveModifier::EN_PASSANT});
-        }
+        addPotentialPawnCaptures(potentialMoves, board, potentialCaptureTargetField, pieceOnField);
     }
     if (currentFile != H) {
         ChessField potentialCaptureTargetField = {currentFile + 1, currentRank + direction};
-        auto potentialCaptureTarget = board.getPieceOnField(potentialCaptureTargetField);
-        if (potentialCaptureTarget.has_value() && std::get<ColorIdx>(potentialCaptureTarget.value()) != color) {
-            Move captureMove = {cp, currentField, potentialCaptureTargetField};
-            if (std::get<ChessRankIdx>(potentialCaptureTargetField) == 8 || std::get<ChessRankIdx>(potentialCaptureTargetField) == 1) {
-                captureMove.addModifier(MoveModifier::CAPTURE);
-                captureMove.addModifier(MoveModifier::PROMOTE_BISHOP);
-                potentialMoves.push_back(captureMove);
-                captureMove.clearModifiers();
-                captureMove.addModifier(MoveModifier::CAPTURE);
-                captureMove.addModifier(MoveModifier::PROMOTE_KNIGHT);
-                potentialMoves.push_back(captureMove);
-                captureMove.clearModifiers();
-                captureMove.addModifier(MoveModifier::CAPTURE);
-                captureMove.addModifier(MoveModifier::PROMOTE_ROOK);
-                potentialMoves.push_back(captureMove);
-                captureMove.clearModifiers();
-                captureMove.addModifier(MoveModifier::CAPTURE);
-                captureMove.addModifier(MoveModifier::PROMOTE_QUEEN);
-                potentialMoves.push_back(std::move(captureMove));
-            } else {
-                captureMove.addModifier(MoveModifier::CAPTURE);
-                potentialMoves.push_back(std::move(captureMove));
-            }
-        } else if (potentialCaptureTargetField == board.getEnPassantTarget()) {
-            potentialMoves.emplace_back(cp, currentField, potentialCaptureTargetField,
-                                        std::set<MoveModifier>{MoveModifier::CAPTURE, MoveModifier::EN_PASSANT});
-        }
+        addPotentialPawnCaptures(potentialMoves, board, potentialCaptureTargetField, pieceOnField);
     }
 
     return potentialMoves;
