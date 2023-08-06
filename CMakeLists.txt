@@ -36,6 +36,7 @@ include_directories(ext/imgui)
 include_directories(ext/imgui/backends)
 include_directories(ext/json/include)
 include_directories(ext/fmt/include)
+include_directories(ext/sml)
 
 include_directories(src/lib)
 include_directories(src/gui)

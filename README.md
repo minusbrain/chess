@@ -97,12 +97,20 @@ See the following example
 
 # Licenses and external dependencies
 
-* [This engine is published under MIT license](LICENSE)
+[This engine is published under MIT license](LICENSE)
+
+## Included dependencies
+
 * Depends on [aelib](https://github.com/minusbrain/aelib) - MIT License
 * Depends on [fmt](https://github.com/fmtlib/fmt) - MIT License
 * Depends on [imgui](https://github.com/ocornut/imgui) - MIT License
 * Depends on [nlohmann/json](https://github.com/nlohmann/json) - MIT License
+* Depends on [sml](https://github.com/boost-ext/sml)- BSL-1.0 license
 * Sprites from [Rad Potato](https://rad-potato.itch.io/pixel-perfect-ultimate-game-component-kit) - Creative Commons
+
+## Expected dependencies
+
+* SDL2 and SDL2_Image installed
 
 # Ideas
 
